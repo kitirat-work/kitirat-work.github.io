@@ -1,1 +1,0 @@
-# kitirat-work.github.io
