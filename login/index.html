@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Page</title>
+  <style>
+    body {
+      background-color: #f0f2f5;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .card {
+      background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      padding: 24px 32px;
+      width: 360px;
+    }
+
+    h2 {
+      margin-bottom: 4px;
+    }
+
+    h3 {
+      margin-top: 0;
+      margin-bottom: 20px;
+      font-size: 14px;
+      color: #555;
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+
+    input[type="text"]:focus,
+    input[type="password"]:focus {
+      outline: none;
+      border-color: #007bff;
+    }
+
+    .icon-button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      margin: 4px;
+      padding: 0;
+      font-size: 18px;
+    }
+
+    form>div {
+      margin-bottom: 14px;
+    }
+
+    #rememberMe {
+      margin-right: 4px;
+    }
+
+    #forgotPassword {
+      font-size: 13px;
+      color: #007bff;
+      text-decoration: none;
+      margin-left: 8px;
+    }
+
+    #forgotPassword:hover {
+      text-decoration: underline;
+    }
+
+    button {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    #submit-button {
+      background-color: #007bff;
+      color: white;
+    }
+
+    #submit-button:hover {
+      background-color: #0056b3;
+    }
+
+    button[type="reset"] {
+      background-color: #e4e6eb;
+      margin-left: 6px;
+    }
+
+    #successMessage {
+      background-color: #e6ffed;
+      color: #0a6e2a;
+      padding: 8px;
+      border-radius: 4px;
+      margin-bottom: 10px;
+    }
+
+    #errorMessage {
+      background-color: #ffe6e6;
+      color: #a00;
+      padding: 8px;
+      border-radius: 4px;
+      margin-bottom: 10px;
+    }
+
+    #demoAccountBtn {
+      font-size: 13px;
+      color: #555;
+      background-color: #f9f9f9;
+      padding: 6px 8px;
+      border-radius: 4px;
+      border: 1px dashed #ccc;
+      cursor: pointer;
+    }
+
+    #demoAccountBtn:hover {
+      background-color: #f1f1f1;
+    }
+
+    #project-description {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #777;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <h2>เข้าสู่ระบบ</h2>
+    <h3>ยินดีต้อนรับ! ลงชื่อเข้าใช้เพื่อดำเนินการต่อ</h3>
+    <!-- เข้าสู่ระบบสำเร็จ! กำลังนำทางไปยังแดชบอร์ด... -->
+    <div id="successMessage" style="display: none;">เข้าสู่ระบบสำเร็จ! กำลังนำทางไปยังแดชบอร์ด...</div>
+    <div id="errorMessage" style="color: red; display: none;">ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง ❌</div>
+    <form id="loginForm" novalidate>
+      <div>
+        <label for="username">ชื่อผู้ใช้:</label>
+        <input type="text" id="username" name="username" required>
+      </div>
+      <div>
+        <div style="display: flex; align-items: center;">
+          <label for="password">รหัสผ่าน:</label>
+          <button type="button" id="togglePassword" class="icon-button" aria-label="Toggle password visibility"
+            title="Show password">👁️</button>
+        </div>
+        <input type="password" id="password" name="password" required>
+      </div>
+      <div style="display: flex; align-items: center; justify-content: space-between;">
+        <div style="display: flex; align-items: center;">
+          <input type="checkbox" id="rememberMe" name="rememberMe">
+          <label for="rememberMe" style="margin: 0;">จดจำฉัน</label>
+        </div>
+        <a id="forgotPassword" href="#">ลืมรหัสผ่าน?</a>
+      </div>
+      <div>
+        <button id="submit-button" type="submit">เข้าสู่ระบบ</button>
+        <button type="reset">รีเซ็ต</button>
+      </div>
+    </form>
+    <p id="demoAccountBtn">เดโม่ทดสอบ: อีเมล admin@example.com / รหัสผ่าน Passw0rd!</p>
+    <br>
+    <p id="project-description">ตัวอย่างหน้า Login ด้วย HTML + CSS (AI) + JS (ไม่ใช้ไลบรารี)</p>
+  </div>
+</body>
+<script>
+  // remember username
+  window.addEventListener('load', () => {
+    const rememberedUsername = localStorage.getItem('rememberedUsername');
+    if (rememberedUsername) {
+      document.getElementById('username').value = rememberedUsername;
+      document.getElementById('rememberMe').checked = true;
+    }
+  });
+
+  // receive on submit form
+  const form = document.getElementById('loginForm');
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const username = form.username.value;
+    const password = form.password.value;
+    // เดโม่ทดสอบ: อีเมล admin@example.com / รหัสผ่าน Passw0rd!
+    if (username === 'admin@example.com' && password === 'Passw0rd!') {
+      document.getElementById('successMessage').style.display = 'block';
+      document.getElementById('errorMessage').style.display = 'none';
+    } else {
+      document.getElementById('successMessage').style.display = 'none';
+      document.getElementById('errorMessage').style.display = 'block';
+    }
+  });
+
+
+  // toggle password visibility
+  const togglePassword = document.getElementById('togglePassword');
+  const passwordField = document.getElementById('password');
+
+  togglePassword.addEventListener('click', () => {
+    let type = passwordField.getAttribute('type');
+    let icon = '👁️';
+    if (type === 'password') {
+      type = 'text';
+      icon = '🙈';
+    } else {
+      type = 'password';
+      icon = '👁️';
+    }
+    passwordField.setAttribute('type', type);
+    togglePassword.textContent = icon;
+  });
+
+  // forgot password link
+  const forgotPasswordLink = document.getElementById('forgotPassword');
+  forgotPasswordLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    alert('ติดต่อฝ่ายสนับสนุนเพื่อรีเซ็ตรหัสผ่านของคุณ');
+  });
+
+  // remember me checkbox
+  const rememberMeCheckbox = document.getElementById('rememberMe');
+  rememberMeCheckbox.addEventListener('change', (e) => {
+    if (e.target.checked) {
+      console.log('ผู้ใช้เลือกที่จะจดจำการเข้าสู่ระบบ');
+      localStorage.setItem('rememberedUsername', form.username.value);
+    } else {
+      console.log('ผู้ใช้ไม่ได้เลือกที่จะจดจำการเข้าสู่ระบบ');
+      localStorage.removeItem('rememberedUsername');
+    }
+  });
+
+  // when demo-account button clicked
+  const demoAccountBtn = document.getElementById('demoAccountBtn');
+  demoAccountBtn.addEventListener('click', () => {
+    form.username.value = 'admin@example.com';
+    form.password.value = 'Passw0rd!';
+  });
+</script>
+
+</html>
