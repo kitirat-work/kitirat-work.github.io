@@ -1,20 +1,1116 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React + TS</title>
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>เลขนัยสำคัญ — สรุปสำหรับพิมพ์</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    <script
-  src="https://challenges.cloudflare.com/turnstile/v0/api.js"
-  async
-  defer
-></script>
-    <script type="module" crossorigin src="/assets/index-CCSG8cDD.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-Dtn62Xmo.css">
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
+    :root {
+      --bg: #ffffff;
+      --surface: #f5f5f5;
+      --surface2: #ebebeb;
+      --border: #cccccc;
+      --border-strong: #333333;
+      --text: #111111;
+      --muted: #555555;
+      --light: #888888;
+      --mono: 'IBM Plex Mono', monospace;
+      --sans: 'IBM Plex Sans Thai', sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 14px;
+      line-height: 1.65;
+      padding: 2rem 1.5rem 3rem;
+    }
+
+    .container { max-width: 760px; margin: 0 auto; }
+
+    /* Print button — screen only */
+    .print-bar {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 1.25rem;
+    }
+    .print-btn {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      background: var(--text);
+      color: var(--bg);
+      border: none;
+      border-radius: 4px;
+      padding: 0.4rem 0.9rem;
+      cursor: pointer;
+    }
+    .print-btn:hover { background: #333; }
+
+    /* Hero */
+    .hero {
+      border-top: 3px solid var(--text);
+      border-bottom: 1px solid var(--border);
+      padding: 1.5rem 0 1.25rem;
+      margin-bottom: 2rem;
+    }
+    .hero-label {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--light);
+      margin-bottom: 0.4rem;
+    }
+    .hero h1 {
+      font-size: 2rem;
+      font-weight: 600;
+      line-height: 1.1;
+      margin-bottom: 0.35rem;
+    }
+    .hero p { color: var(--muted); font-size: 0.88rem; }
+
+    /* Section */
+    section {
+      margin-bottom: 1.75rem;
+      break-inside: avoid;
+    }
+    .section-tag {
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--light);
+      margin-bottom: 0.3rem;
+    }
+    h2 {
+      font-size: 1rem;
+      font-weight: 600;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.3rem;
+      margin-bottom: 0.85rem;
+    }
+
+    /* Rules table */
+    .rules-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    .rules-table th {
+      background: var(--surface2);
+      text-align: left;
+      padding: 0.4rem 0.65rem;
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+    .rules-table td {
+      padding: 0.4rem 0.65rem;
+      border: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    .rules-table tr:nth-child(even) td { background: var(--surface); }
+    .badge {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      border: 1px solid var(--border-strong);
+      border-radius: 3px;
+      padding: 0.1rem 0.35rem;
+      white-space: nowrap;
+      display: inline-block;
+    }
+    .badge-yes { background: #111; color: #fff; }
+    .badge-no  { background: #fff; color: #111; }
+    .badge-q   { background: #ddd; color: #111; }
+    .mono { font-family: var(--mono); font-size: 0.83rem; }
+
+    /* 2-col grid */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+    @media (max-width: 520px) { .two-col { grid-template-columns: 1fr; } }
+
+    /* Calc card */
+    .calc-card {
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.85rem 0.9rem;
+      break-inside: avoid;
+    }
+    .calc-card h3 { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.25rem; }
+    .calc-card .sub { font-size: 0.78rem; color: var(--muted); margin-bottom: 0.6rem; }
+    .calc-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 0.6rem 0.75rem;
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      line-height: 1.85;
+    }
+    .calc-block .hl  { font-weight: 600; text-decoration: underline; }
+    .calc-block .res { font-weight: 700; }
+    .calc-block .dim { color: var(--muted); }
+    .calc-block .note { color: var(--light); font-size: 0.72rem; }
+    .hdivider { border: none; border-top: 1px solid var(--border); margin: 0.4rem 0; }
+
+    /* Formula strip */
+    .formula-strip {
+      display: flex;
+      gap: 0;
+      border: 1px solid var(--border-strong);
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 0.75rem 0;
+    }
+    .f-cell {
+      flex: 1;
+      text-align: center;
+      padding: 0.6rem 0.5rem;
+      border-right: 1px solid var(--border);
+    }
+    .f-cell:last-child { border-right: none; }
+    .f-cell:nth-child(odd) { background: var(--surface); }
+    .f-cell .fl { font-family: var(--mono); font-size: 0.6rem; color: var(--light); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.2rem; }
+    .f-cell .fv { font-family: var(--mono); font-size: 0.88rem; font-weight: 500; }
+
+    /* Steps */
+    .steps { display: grid; gap: 0.4rem; }
+    .step {
+      display: flex;
+      gap: 0.6rem;
+      align-items: flex-start;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.5rem 0.7rem;
+      font-size: 0.84rem;
+    }
+    .step-n {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      background: var(--text);
+      color: var(--bg);
+      border-radius: 2px;
+      padding: 0.1rem 0.35rem;
+      flex-shrink: 0;
+      margin-top: 0.15rem;
+    }
+    .step-note { color: var(--muted); font-size: 0.78rem; margin-top: 0.1rem; }
+
+    /* Error propagation table */
+    .ep-table { border: 1px solid var(--border-strong); border-radius: 4px; overflow: hidden; margin-bottom: 0.5rem; }
+    .ep-row { display: grid; grid-template-columns: 80px 1fr auto; align-items: stretch; border-bottom: 1px solid var(--border); }
+    .ep-row:last-child { border-bottom: none; }
+    .ep-row:nth-child(even) { background: var(--surface); }
+    .ep-label {
+      font-family: var(--mono); font-size: 0.78rem; font-weight: 600;
+      text-align: center; padding: 0.7rem 0.4rem;
+      border-right: 1px solid var(--border-strong); background: var(--surface2);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .ep-formula {
+      font-family: var(--mono); font-size: 0.88rem;
+      padding: 0.65rem 1rem; display: flex; align-items: center;
+      gap: 0.45rem; flex-wrap: wrap; border-right: 1px solid var(--border);
+    }
+    .ep-lhs { color: var(--muted); }
+    .ep-eq  { font-weight: 700; }
+    .ep-rhs { font-weight: 600; }
+    .frac { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; font-size: 0.8rem; line-height: 1.25; margin: 0 0.1rem; }
+    .fnum { border-bottom: 1px solid currentColor; padding-bottom: 2px; text-align: center; white-space: nowrap; }
+    .fden { padding-top: 2px; text-align: center; white-space: nowrap; }
+    .ep-paren { display: inline-flex; align-items: center; gap: 0.25rem; font-size: 0.78rem; }
+    .ep-note { font-size: 0.74rem; color: var(--muted); padding: 0.65rem 0.75rem; max-width: 170px; line-height: 1.45; display: flex; align-items: center; }
+    @media (max-width: 560px) { .ep-row { grid-template-columns: 64px 1fr; } .ep-note { display: none; } }
+    @media print { .ep-note { display: flex !important; } }
+
+    /* ep-block: per-operation subsection */
+    .ep-block {
+      display: grid;
+      grid-template-columns: 80px 1fr;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      margin-bottom: 0.6rem;
+      overflow: hidden;
+    }
+    .ep-block-label {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      font-weight: 600;
+      background: var(--surface2);
+      border-right: 1px solid var(--border-strong);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 0.5rem 0.35rem;
+    }
+    .ep-block-body {
+      padding: 0.65rem 0.9rem;
+    }
+    .ep-block-formula {
+      font-family: var(--mono);
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.25rem;
+      line-height: 1;
+    }
+    .ep-frac-formula { align-items: center; }
+    .ep-block-note {
+      font-size: 0.76rem;
+      color: var(--muted);
+      margin-bottom: 0;
+    }
+    @media (max-width: 520px) { .ep-block { grid-template-columns: 56px 1fr; } }
+
+    /* Summary table */
+    .sum-table { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
+    .sum-table th {
+      background: var(--text);
+      color: var(--bg);
+      text-align: left;
+      padding: 0.4rem 0.7rem;
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .sum-table td { padding: 0.45rem 0.7rem; border-bottom: 1px solid var(--border); }
+    .sum-table tr:nth-child(even) td { background: var(--surface); }
+    .sum-table tr:last-child td { border-bottom: none; }
+    .op-tag {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      border: 1px solid var(--border-strong);
+      border-radius: 3px;
+      padding: 0.1rem 0.4rem;
+      white-space: nowrap;
+    }
+    .rule-val { font-weight: 600; }
+    .eg { font-family: var(--mono); font-size: 0.78rem; color: var(--muted); }
+
+    /* Tip box */
+    .tip {
+      border-left: 3px solid var(--text);
+      background: var(--surface);
+      padding: 0.6rem 0.85rem;
+      font-size: 0.84rem;
+      border-radius: 0 4px 4px 0;
+    }
+    .tip strong { font-size: 0.72rem; font-family: var(--mono); letter-spacing: 0.08em; text-transform: uppercase; display: block; margin-bottom: 0.25rem; }
+
+    /* Graph */
+    .graph-wrap {
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.85rem;
+      margin-bottom: 0.75rem;
+      break-inside: avoid;
+    }
+    .graph-wrap h3 { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.75rem; }
+    canvas { display: block; width: 100%; }
+    .graph-controls {
+      display: flex;
+      gap: 1.5rem;
+      margin-top: 0.75rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .graph-controls label { font-size: 0.82rem; color: var(--muted); display: flex; flex-direction: column; gap: 0.2rem; }
+    .graph-controls input[type=range] { accent-color: var(--text); width: 130px; cursor: pointer; }
+    #eqDisplay {
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      margin-top: 0.5rem;
+      padding: 0.35rem 0.6rem;
+      background: var(--surface2);
+      border-radius: 3px;
+      display: inline-block;
+    }
+
+    /* Intercept grid */
+    .int-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; margin-top: 0.6rem; }
+    @media (max-width: 480px) { .int-grid { grid-template-columns: 1fr; } }
+    .int-card { border: 1px solid var(--border); border-radius: 4px; padding: 0.65rem 0.8rem; }
+    .int-card .il { font-family: var(--mono); font-size: 0.62rem; color: var(--light); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.2rem; }
+    .int-card .iv { font-family: var(--mono); font-size: 0.9rem; font-weight: 600; margin-bottom: 0.15rem; }
+    .int-card .id { font-size: 0.78rem; color: var(--muted); }
+
+    /* Error section */
+    .err-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    @media (max-width: 520px) { .err-grid { grid-template-columns: 1fr; } }
+    .err-card { border: 1px solid var(--border); border-radius: 4px; padding: 0.85rem 0.9rem; break-inside: avoid; }
+    .err-card .eo { font-size: 0.82rem; font-weight: 600; margin-bottom: 0.2rem; }
+    .err-card .ef { font-family: var(--mono); font-size: 0.82rem; color: var(--muted); margin-bottom: 0.2rem; }
+    .err-card .er { font-family: var(--mono); font-size: 1rem; font-weight: 700; border-bottom: 1px solid var(--border); padding-bottom: 0.35rem; margin-bottom: 0.35rem; }
+    .err-card .en { font-size: 0.76rem; color: var(--muted); margin-bottom: 0.5rem; }
+    .err-ex-block { background: var(--surface); border-radius: 3px; padding: 0.45rem 0.6rem; }
+    .err-ex-label { font-family: var(--mono); font-size: 0.6rem; color: var(--light); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.2rem; }
+    .err-ex { font-family: var(--mono); font-size: 0.76rem; color: var(--muted); line-height: 1.7; }
+    .err-ex-result { font-family: var(--mono); font-size: 0.85rem; font-weight: 700; }
+
+    /* Interactive error calc */
+    .err-calc {
+      border: 1px solid var(--border-strong);
+      border-radius: 4px;
+      padding: 0.85rem 1rem;
+      margin-top: 0.75rem;
+      break-inside: avoid;
+    }
+    .err-calc-title { font-size: 0.82rem; font-weight: 600; margin-bottom: 0.7rem; }
+    .err-inputs { display: flex; align-items: flex-end; gap: 0.5rem; flex-wrap: wrap; }
+    .err-inputs .ig { display: flex; flex-direction: column; gap: 0.2rem; }
+    .err-inputs label { font-family: var(--mono); font-size: 0.67rem; color: var(--muted); letter-spacing: 0.05em; }
+    .err-inputs input {
+      width: 74px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      padding: 0.35rem 0.45rem;
+      outline: none;
+    }
+    .err-inputs input:focus { border-color: var(--text); }
+    .err-inputs select {
+      background: var(--text);
+      color: var(--bg);
+      border: none;
+      border-radius: 3px;
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      padding: 0.35rem 0.5rem;
+      cursor: pointer;
+      outline: none;
+      align-self: flex-end;
+    }
+    #errResult {
+      margin-top: 0.7rem;
+      font-family: var(--mono);
+      font-size: 0.88rem;
+      background: var(--surface);
+      border-radius: 3px;
+      padding: 0.55rem 0.75rem;
+      min-height: 2.2rem;
+      line-height: 1.7;
+    }
+
+    /* Print-only graph placeholder */
+    .print-graph-placeholder {
+      display: none;
+      border: 1px solid var(--border);
+      height: 220px;
+      border-radius: 4px;
+      align-items: center;
+      justify-content: center;
+      color: var(--light);
+      font-size: 0.8rem;
+      font-family: var(--mono);
+      margin-bottom: 0.75rem;
+    }
+
+    /* Exercises */
+    .ex-group-label {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--light);
+      margin: 1rem 0 0.4rem;
+    }
+    .ex-list { display: grid; gap: 0.4rem; margin-bottom: 0.25rem; }
+    .ex-item {
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      cursor: pointer;
+      overflow: hidden;
+      transition: border-color 0.15s;
+    }
+    .ex-item:hover { border-color: var(--border-strong); }
+    .ex-item.open { border-color: var(--border-strong); }
+    .ex-q {
+      padding: 0.55rem 0.85rem;
+      font-size: 0.88rem;
+      display: flex;
+      gap: 0.5rem;
+      align-items: baseline;
+      user-select: none;
+    }
+    .ex-q::after { content: '▸'; margin-left: auto; font-size: 0.7rem; color: var(--light); transition: transform 0.15s; flex-shrink: 0; }
+    .ex-item.open .ex-q::after { transform: rotate(90deg); }
+    .ex-num { font-family: var(--mono); font-size: 0.75rem; color: var(--light); flex-shrink: 0; }
+    .ex-ans {
+      display: none;
+      padding: 0.5rem 0.85rem 0.6rem 2rem;
+      font-size: 0.84rem;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      line-height: 1.6;
+    }
+    .ex-item.open .ex-ans { display: block; }
+    @media print { .ex-ans { display: block !important; } .ex-q::after { display: none; } }
+
+    /* ─── PRINT STYLES ─── */
+    @media print {
+      @page { size: A4; margin: 15mm 15mm 18mm; }
+
+      body { padding: 0; font-size: 11px; }
+      .print-bar, .graph-controls, #eqDisplay, .err-calc { display: none !important; }
+      .print-graph-placeholder { display: flex !important; }
+      canvas { display: none !important; }
+
+      section { break-inside: avoid; margin-bottom: 1.2rem; }
+      .two-col, .err-grid { break-inside: avoid; }
+      .calc-card, .err-card, .int-card, .step { break-inside: avoid; }
+
+      h2 { font-size: 0.9rem; }
+      .hero h1 { font-size: 1.5rem; }
+      .hero { padding: 1rem 0 0.85rem; margin-bottom: 1.25rem; }
+      .sum-table th { background: #222 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .badge-yes { background: #111 !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .step-n { background: #111 !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <div class="print-bar">
+    <button class="print-btn" onclick="window.print()">🖨 พิมพ์ / บันทึก PDF</button>
+  </div>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-label">วิทยาศาสตร์ · คณิตศาสตร์ · สรุปเพื่อการเรียน</div>
+    <h1>เลขนัยสำคัญ (Significant Figures)</h1>
+    <p>กฎการนับ · การคำนวณ · การปัดเลข · กราฟและความชัน · ค่าความคลาดเคลื่อน</p>
+  </div>
+
+  <!-- 01 กฎการนับ -->
+  <section>
+    <div class="section-tag">01 — กฎการนับ</div>
+    <h2>ตัวเลขไหนนับ ตัวเลขไหนไม่นับ?</h2>
+    <table class="rules-table">
+      <thead>
+        <tr>
+          <th>กฎ</th>
+          <th>นับ?</th>
+          <th>ตัวอย่าง</th>
+          <th>จำนวนนัยสำคัญ</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>เลข 1–9 นับเสมอ</td>
+          <td><span class="badge badge-yes">✓ นับ</span></td>
+          <td class="mono">3.45</td>
+          <td>3</td>
+        </tr>
+        <tr>
+          <td>ศูนย์ระหว่างตัวเลข</td>
+          <td><span class="badge badge-yes">✓ นับ</span></td>
+          <td class="mono">3.05</td>
+          <td>3</td>
+        </tr>
+        <tr>
+          <td>ศูนย์หลังทศนิยม (ท้ายตัวเลข)</td>
+          <td><span class="badge badge-yes">✓ นับ</span></td>
+          <td class="mono">3.50</td>
+          <td>3</td>
+        </tr>
+        <tr>
+          <td>ศูนย์นำหน้า (ก่อนตัวเลข)</td>
+          <td><span class="badge badge-no">✗ ไม่นับ</span></td>
+          <td class="mono">0.0045</td>
+          <td>2</td>
+        </tr>
+        <tr>
+          <td>ศูนย์ท้ายจำนวนเต็ม — นับเสมอเมื่อเขียนตรงๆ<br><span style="font-size:0.75rem;color:#888;">หากต้องการน้อยกว่านั้น ใช้สัญกรณ์วิทยาศาสตร์</span></td>
+          <td><span class="badge badge-yes">✓ นับ</span></td>
+          <td class="mono">35000<br><span style="font-size:0.75rem;color:#888;">3.5×10⁴ = 2 ตัว</span></td>
+          <td>5<br><span style="font-size:0.75rem;color:#888;">(3,5,0,0,0)</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 02 การคำนวณ -->
+  <section>
+    <div class="section-tag">02 — การคำนวณ</div>
+    <h2>วิธีใช้ในการคำนวณ</h2>
+    <div class="two-col">
+      <div class="calc-card">
+        <h3>+ บวก &nbsp;/ &nbsp;− ลบ</h3>
+        <div class="sub">ใช้ตำแหน่งทศนิยมที่น้อยที่สุด</div>
+        <div class="calc-block">
+          <div class="dim">&nbsp; 12.11 &nbsp;← 2 ตำแหน่ง</div>
+          <div>+ &nbsp;3.5 &nbsp;&nbsp;← <span class="hl">1 ตำแหน่ง</span></div>
+          <div class="dim">&nbsp;&nbsp;0.006</div>
+          <div class="hdivider"></div>
+          <div class="dim">&nbsp; 15.616</div>
+          <div class="res">→ ปัดเป็น 15.6</div>
+        </div>
+      </div>
+      <div class="calc-card">
+        <h3>× คูณ &nbsp;/ &nbsp;÷ หาร</h3>
+        <div class="sub">ใช้จำนวนนัยสำคัญที่น้อยที่สุด</div>
+        <div class="calc-block">
+          <div class="dim">&nbsp; 4.56 &nbsp;← 3 นัยสำคัญ</div>
+          <div>× &nbsp;1.4 &nbsp;&nbsp;← <span class="hl">2 นัยสำคัญ</span></div>
+          <div class="hdivider"></div>
+          <div class="dim">&nbsp; 6.384</div>
+          <div class="res">→ ปัดเป็น 6.4</div>
+        </div>
+      </div>
+    </div>
+    <div class="two-col" style="margin-top:0.6rem;">
+      <div class="calc-card">
+        <h3>ตัวอย่าง: การลบ</h3>
+        <div class="calc-block">
+          <div>100.0 ← <span class="hl">1 ตำแหน่ง</span></div>
+          <div class="dim">− 23.56</div>
+          <div class="hdivider"></div>
+          <div class="dim">76.44</div>
+          <div class="res">→ ปัดเป็น 76.4</div>
+        </div>
+      </div>
+      <div class="calc-card">
+        <h3>ตัวอย่าง: การหาร</h3>
+        <div class="calc-block">
+          <div>8.315 ← 4 นัยสำคัญ</div>
+          <div>÷ 298 &nbsp;← <span class="hl">3 นัยสำคัญ</span></div>
+          <div class="hdivider"></div>
+          <div class="dim">0.027902...</div>
+          <div class="res">→ ปัดเป็น 0.0279</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 การปัดเลข -->
+  <section>
+    <div class="section-tag">03 — การปัดเลข</div>
+    <h2>กฎการปัดเลข (Rounding Rules)</h2>
+    <table class="rules-table">
+      <thead>
+        <tr><th>เงื่อนไข</th><th>การกระทำ</th><th>ตัวอย่าง</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>ตัวเลขที่ปัด <strong>&lt; 5</strong></td>
+          <td><span class="badge badge-no">ปัดลง — ตัดทิ้ง</span></td>
+          <td class="mono">3.74 → 3.7</td>
+        </tr>
+        <tr>
+          <td>ตัวเลขที่ปัด <strong>&gt; 5</strong></td>
+          <td><span class="badge badge-yes">ปัดขึ้น — เพิ่ม 1</span></td>
+          <td class="mono">3.76 → 3.8</td>
+        </tr>
+        <tr>
+          <td>ตัวเลขที่ปัด <strong>= 5</strong> มีเลขตามหลัง</td>
+          <td><span class="badge badge-yes">ปัดขึ้น — เพิ่ม 1</span></td>
+          <td class="mono">3.751 → 3.8</td>
+        </tr>
+        <tr>
+          <td>ตัวเลขที่ปัด <strong>= 5</strong> เท่านั้น (Banker's)</td>
+          <td><span class="badge badge-q">ปัดให้ตัวก่อนหน้าเป็นเลขคู่</span></td>
+          <td class="mono">2.45 → 2.4 &nbsp;/&nbsp; 2.35 → 2.4</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="two-col" style="margin-top:0.65rem;">
+      <div class="calc-card">
+        <h3>ตัวอย่าง: ปัดให้ได้ 3 นัยสำคัญ</h3>
+        <div class="calc-block">
+          <div>6.3<span class="hl">4</span>82 → <span class="res">6.35</span></div>
+          <div class="note">&nbsp;&nbsp;&nbsp; ↑ ตัวที่ 4 = 8 &gt; 5 ปัดขึ้น</div>
+          <div class="hdivider"></div>
+          <div>0.074<span class="hl">3</span>6 → <span class="res">0.0744</span></div>
+          <div class="note">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ↑ ตัวที่ 4 = 6 &gt; 5 ปัดขึ้น</div>
+          <div class="hdivider"></div>
+          <div>9.8<span class="hl">4</span>500 → <span class="res">9.84</span></div>
+          <div class="note">&nbsp;&nbsp;&nbsp; ↑ ตัวที่ 4 = 5 เท่านั้น, 4 คู่ คงไว้</div>
+        </div>
+      </div>
+      <div class="calc-card">
+        <h3>ลำดับขั้นตอน</h3>
+        <div class="calc-block">
+          <div><span class="hl">1.</span> ระบุจำนวนนัยสำคัญที่ต้องการ</div>
+          <div><span class="hl">2.</span> นับตัวเลขจากซ้าย (ข้ามศูนย์นำหน้า)</div>
+          <div><span class="hl">3.</span> ดูตัวถัดไปจากตำแหน่งที่ต้องการ</div>
+          <div><span class="hl">4.</span> ปัดตามกฎ (&lt;5 ตัดทิ้ง, &gt;5 ปัดขึ้น)</div>
+          <div><span class="hl">5.</span> ตรวจสอบนัยสำคัญอีกครั้ง</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 กราฟและความชัน -->
+  <section>
+    <div class="section-tag">04 — กราฟและความชัน</div>
+    <h2>กราฟเส้นตรงและความชัน (Slope)</h2>
+
+    <div class="graph-wrap">
+      <h3>กราฟ y = mx + c (ปรับค่าได้)</h3>
+      <!-- screen: canvas / print: placeholder -->
+      <div class="print-graph-placeholder">[ กราฟ y = mx + c — ดูได้ในเวอร์ชันออนไลน์ ]</div>
+      <canvas id="lineChart" height="240"></canvas>
+      <div class="graph-controls">
+        <label>ความชัน m = <strong id="mVal">2</strong>
+          <input type="range" id="slopeRange" min="-5" max="5" step="0.5" value="2">
+        </label>
+        <label>จุดตัดแกน y, c = <strong id="cVal">1</strong>
+          <input type="range" id="interceptRange" min="-5" max="5" step="0.5" value="1">
+        </label>
+      </div>
+      <div id="eqDisplay"></div>
+    </div>
+
+    <div class="formula-strip">
+      <div class="f-cell">
+        <div class="fl">ความชัน</div>
+        <div class="fv">m = Δy / Δx</div>
+      </div>
+      <div class="f-cell">
+        <div class="fl">จากจุดสองจุด</div>
+        <div class="fv">m = (y₂−y₁)/(x₂−x₁)</div>
+      </div>
+      <div class="f-cell">
+        <div class="fl">สมการเส้นตรง</div>
+        <div class="fv">y = mx + c</div>
+      </div>
+    </div>
+
+    <p style="font-size:0.82rem;color:var(--muted);margin-bottom:0.5rem;">ขั้นตอนหาความชันจากกราฟ</p>
+    <div class="steps">
+      <div class="step">
+        <span class="step-n">01</span>
+        <div>เลือก <strong>จุดสองจุดบนเส้น</strong> ที่ห่างกันมากและอ่านค่าได้ชัดเจน
+          <div class="step-note">เช่น (1, 3) และ (5, 11)</div>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-n">02</span>
+        <div>คำนวณ <span class="mono">Δy = y₂ − y₁</span> และ <span class="mono">Δx = x₂ − x₁</span>
+          <div class="step-note">Δy = 11 − 3 = 8 &nbsp;|&nbsp; Δx = 5 − 1 = 4</div>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-n">03</span>
+        <div>คำนวณ <span class="mono">m = Δy ÷ Δx</span> แล้วปัดตามนัยสำคัญ
+          <div class="step-note">m = 8 ÷ 4 = <strong>2.0</strong></div>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-n">04</span>
+        <div>ตีความ: ความชัน <strong>บวก</strong> = เส้นพุ่งขึ้น &nbsp;|&nbsp; <strong>ลบ</strong> = เส้นลาดลง &nbsp;|&nbsp; <strong>0</strong> = เส้นแนวนอน</div>
+      </div>
+    </div>
+
+    <div class="int-grid">
+      <div class="int-card">
+        <div class="il">จุดตัดแกน Y</div>
+        <div class="iv">x = 0 → y = c</div>
+        <div class="id">แทน x = 0 ในสมการ → ได้ค่า y ที่ตัดแกน Y</div>
+      </div>
+      <div class="int-card">
+        <div class="il">จุดตัดแกน X</div>
+        <div class="iv">y = 0 → x = −c/m</div>
+        <div class="id">แทน y = 0 แล้วแก้สมการ → ได้ค่า x ที่ตัดแกน X</div>
+      </div>
+    </div>
+
+    <div class="tip" style="margin-top:0.65rem;">
+      <strong>ความชันกับนัยสำคัญ</strong>
+      ผลลัพธ์ m ต้องมีนัยสำคัญเท่ากับที่น้อยสุดในการหาร เช่น Δy = 8.4 (2 นัยสำคัญ), Δx = 2.10 (3 นัยสำคัญ) → m = 4.0 (2 นัยสำคัญ)
+    </div>
+  </section>
+
+  <!-- 05 ค่าความคลาดเคลื่อน -->
+  <section>
+    <div class="section-tag">05 — ค่าความคลาดเคลื่อน</div>
+    <h2>การหาความคลาดเคลื่อนของผลลัพธ์ (Error Propagation)</h2>
+    <p style="font-size:0.82rem;color:var(--muted);margin-bottom:1rem;">กำหนด <strong>A ± a</strong> และ <strong>B ± b</strong> โดย A, B คือค่าที่วัดได้ และ a, b คือความคลาดเคลื่อน</p>
+
+    <!-- ผลบวก -->
+    <div class="ep-block">
+      <div class="ep-block-label">ผลบวก</div>
+      <div class="ep-block-body">
+        <div class="ep-block-formula">
+          <span class="ep-lhs">(A ± a) + (B ± b)</span>
+          <span class="ep-eq">=</span>
+          <span class="ep-rhs">(A + B) ± (a + b)</span>
+        </div>
+        <div class="ep-block-note">ความคลาดเคลื่อนบวกกันเสมอ</div>
+        <div class="calc-block" style="margin-top:0.5rem;">
+          <div class="dim">(5.2 ± 0.1) + (3.4 ± 0.2)</div>
+          <div class="dim">= (5.2 + 3.4) ± (0.1 + 0.2)</div>
+          <div class="res">= 8.6 ± 0.3</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ผลลบ -->
+    <div class="ep-block">
+      <div class="ep-block-label">ผลลบ</div>
+      <div class="ep-block-body">
+        <div class="ep-block-formula">
+          <span class="ep-lhs">(A ± a) − (B ± b)</span>
+          <span class="ep-eq">=</span>
+          <span class="ep-rhs">(A − B) ± (a + b)</span>
+        </div>
+        <div class="ep-block-note">ลบค่า แต่ความคลาดเคลื่อน<strong>บวกกัน</strong>เสมอ ไม่ลบ</div>
+        <div class="calc-block" style="margin-top:0.5rem;">
+          <div class="dim">(7.5 ± 0.2) − (3.1 ± 0.1)</div>
+          <div class="dim">= (7.5 − 3.1) ± (0.2 + 0.1)</div>
+          <div class="res">= 4.4 ± 0.3</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ผลคูณ -->
+    <div class="ep-block">
+      <div class="ep-block-label">ผลคูณ</div>
+      <div class="ep-block-body">
+        <div class="ep-block-formula">
+          <span class="ep-lhs">(A ± a)(B ± b)</span>
+          <span class="ep-eq">=</span>
+          <span class="ep-rhs">AB ± (Ab + Ba)</span>
+        </div>
+        <div class="ep-block-note">กระจายแล้วตัดพจน์ ab ทิ้ง เพราะ a, b มีค่าน้อยมาก</div>
+        <div class="calc-block" style="margin-top:0.5rem;">
+          <div class="dim">(4.0 ± 0.2)(2.0 ± 0.1)</div>
+          <div class="dim">Ab + Ba = (4.0)(0.1) + (2.0)(0.2) = 0.4 + 0.4</div>
+          <div class="res">= 8.0 ± 0.8</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ผลหาร -->
+    <div class="ep-block">
+      <div class="ep-block-label">ผลหาร</div>
+      <div class="ep-block-body">
+        <div class="ep-block-formula ep-frac-formula">
+          <span class="ep-lhs">
+            <span class="frac"><span class="fnum">A ± a</span><span class="fden">B ± b</span></span>
+          </span>
+          <span class="ep-eq">=</span>
+          <span class="ep-rhs">
+            <span class="frac"><span class="fnum">A</span><span class="fden">B</span></span>
+            <span style="margin:0 0.2rem;">±</span>
+            <span style="font-size:1.6em;line-height:1;font-weight:300;">(</span>
+            <span class="ep-paren">
+              <span class="frac"><span class="fnum">a</span><span class="fden">A</span></span>
+              <span>+</span>
+              <span class="frac"><span class="fnum">b</span><span class="fden">B</span></span>
+            </span>
+            <span style="font-size:1.6em;line-height:1;font-weight:300;">)</span>
+            <span style="margin:0 0.15rem;">(</span>
+            <span class="frac"><span class="fnum">A</span><span class="fden">B</span></span>
+            <span style="margin:0 0.05rem;">)</span>
+          </span>
+        </div>
+        <div class="ep-block-note">นำ (a/A + b/B) คูณกับผลหาร A/B เพื่อได้ความคลาดเคลื่อน</div>
+        <div class="calc-block" style="margin-top:0.5rem;">
+          <div class="dim">(6.0 ± 0.3) ÷ (2.0 ± 0.2)</div>
+          <div class="dim">A/B = 6.0/2.0 = 3.0</div>
+          <div class="dim">a/A + b/B = 0.3/6.0 + 0.2/2.0 = 0.05 + 0.10 = 0.15</div>
+          <div class="dim">ความคลาดเคลื่อน = 0.15 × 3.0 = 0.45 ≈ 0.5</div>
+          <div class="res">= 3.0 ± 0.5</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Interactive calculator -->
+    <div class="err-calc">
+      <div class="err-calc-title">🧮 คำนวณความคลาดเคลื่อนแบบ interactive</div>
+      <div class="err-inputs">
+        <div class="ig"><label>A</label><input type="number" id="x0" value="5.2" step="0.1"></div>
+        <div class="ig"><label>± a</label><input type="number" id="dx" value="0.1" step="0.01" min="0"></div>
+        <select id="opSelect">
+          <option value="add">+ บวก</option>
+          <option value="sub">− ลบ</option>
+          <option value="mul">× คูณ</option>
+          <option value="div">÷ หาร</option>
+        </select>
+        <div class="ig"><label>B</label><input type="number" id="y0" value="3.4" step="0.1"></div>
+        <div class="ig"><label>± b</label><input type="number" id="dy" value="0.2" step="0.01" min="0"></div>
+      </div>
+      <div id="errResult"></div>
+    </div>
+  </section>
+
+  <!-- 06 ตารางสรุป -->
+  <section>
+    <div class="section-tag">06 — ตารางสรุปรวม</div>
+    <h2>ตารางสรุป</h2>
+    <table class="sum-table">
+      <thead>
+        <tr>
+          <th>การคำนวณ</th>
+          <th>กฎนัยสำคัญ</th>
+          <th>สูตรความคลาดเคลื่อน</th>
+          <th>ตัวอย่างผลลัพธ์</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="op-tag">+ บวก</span></td>
+          <td class="rule-val">ตำแหน่งทศนิยมน้อยสุด</td>
+          <td class="eg">(A+B) ± (a+b)</td>
+          <td class="eg">8.6 ± 0.3</td>
+        </tr>
+        <tr>
+          <td><span class="op-tag">− ลบ</span></td>
+          <td class="rule-val">ตำแหน่งทศนิยมน้อยสุด</td>
+          <td class="eg">(A−B) ± (a+b)</td>
+          <td class="eg">4.4 ± 0.3</td>
+        </tr>
+        <tr>
+          <td><span class="op-tag">× คูณ</span></td>
+          <td class="rule-val">จำนวนนัยสำคัญน้อยสุด</td>
+          <td class="eg">AB ± (Ab+Ba)</td>
+          <td class="eg">8.0 ± 0.8</td>
+        </tr>
+        <tr>
+          <td><span class="op-tag">÷ หาร</span></td>
+          <td class="rule-val">จำนวนนัยสำคัญน้อยสุด</td>
+          <td class="eg">A/B ± (a/A+b/B)(A/B)</td>
+          <td class="eg">3.0 ± 0.5</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Tip -->
+  <div class="tip">
+    <strong>💡 เทคนิคจำง่าย</strong>
+    บวก/ลบ → ดูตำแหน่งทศนิยม &nbsp;|&nbsp; คูณ/หาร → นับจำนวนนัยสำคัญ &nbsp;|&nbsp; ความคลาดเคลื่อน บวก/ลบ → สัมบูรณ์ &nbsp;|&nbsp; คูณ/หาร → สัมพัทธ์
+  </div>
+
+  <!-- 07 แบบฝึกหัด -->
+  <section style="margin-top:1.5rem;">
+    <div class="section-tag">07 — แบบฝึกหัด</div>
+    <h2>แบบฝึกหัด</h2>
+    <p style="font-size:0.82rem;color:var(--muted);margin-bottom:1rem;">กดที่ข้อเพื่อดูเฉลย</p>
+
+    <!-- หมวด 1: กฎการนับ -->
+    <p class="ex-group-label">หมวด 1 — กฎการนับนัยสำคัญ</p>
+    <div class="ex-list">
+      <div class="ex-item" onclick="toggleAns(this)">
+        <div class="ex-q"><span class="ex-num">1.</span> 0.00420 มีกี่นัยสำคัญ?</div>
+        <div class="ex-ans">3 นัยสำคัญ — ตัวเลขที่นับคือ 4, 2, 0 (ศูนย์นำหน้าไม่นับ แต่ศูนย์ท้ายทศนิยมนับ)</div>
+      </div>
+      <div class="ex-item" onclick="toggleAns(this)">
+        <div class="ex-q"><span class="ex-num">2.</span> 3.060 × 10² มีกี่นัยสำคัญ?</div>
+        <div class="ex-ans">4 นัยสำคัญ — 3, 0, 6, 0 (ศูนย์ระหว่างตัวเลขนับ และศูนย์ท้ายทศนิยมนับ)</div>
+      </div>
+      <div class="ex-item" onclick="toggleAns(this)">
+        <div class="ex-q"><span class="ex-num">3.</span> 120500 มีกี่นัยสำคัญ?</div>
+        <div class="ex-ans">6 นัยสำคัญ — 1, 2, 0, 5, 0, 0 ทุกตัวนับเมื่อเขียนเป็นจำนวนเต็มโดยตรง (ถ้าต้องการน้อยกว่านี้ต้องใช้สัญกรณ์วิทยาศาสตร์)</div>
+      </div>
+    </div>
+
+    <!-- หมวด 2: บวก/ลบ -->
+    <p class="ex-group-label">หมวด 2 — การบวกและลบ</p>
+    <div class="ex-list">
+      <div class="ex-item" onclick="toggleAns(this)">
+        <div class="ex-q"><span class="ex-num">4.</span> 13.5 + 2.46 + 0.135 = ?</div>
+        <div class="ex-ans">16.1 — ผลรวมดิบ = 16.095 แต่ 13.5 มีทศนิยมน้อยสุด (1 ตำแหน่ง) จึงปัดเป็น 16.1</div>
+      </div>
+      <div class="ex-item" onclick="toggleAns(this)">
+        <div class="ex-q"><span class="ex-num">5.</span> 200.0 − 18.36 = ?</div>
+        <div class="ex-ans">181.6 — ผลลบดิบ = 181.64 แต่ 200.0 มีทศนิยม 1 ตำแหน่ง จึงปัดเป็น 181.6</div>
+      </div>
+      <div class="ex-item" onclick="toggleAns(this)">
+        <div class="ex-q"><span class="ex-num">6.</span> 1.002 + 0.0040 = ?</div>
+        <div class="ex-ans">1.006 — ผลรวมดิบ = 1.0060 แต่ 1.002 มีทศนิยม 3 ตำแหน่ง (น้อยสุด) จึงปัดเป็น 1.006</div>
+      </div>
+    </div>
+
+    <!-- หมวด 3: คูณ/หาร -->
+    <p class="ex-group-label">หมวด 3 — การคูณและหาร</p>
+    <div class="ex-list">
+      <div class="ex-item" onclick="toggleAns(this)">
+        <div class="ex-q"><span class="ex-num">7.</span> 2.5 × 3.42 = ?</div>
+        <div class="ex-ans">8.6 — ผลคูณดิบ = 8.55 แต่ 2.5 มีนัยสำคัญน้อยสุด (2 ตัว) จึงปัดเป็น 8.6</div>
+      </div>
+      <div class="ex-item" onclick="toggleAns(this)">
+        <div class="ex-q"><span class="ex-num">8.</span> 6.24 ÷ 0.080 = ?</div>
+        <div class="ex-ans">78 — ผลหารดิบ = 78.0 แต่ 0.080 มีนัยสำคัญน้อยสุด (2 ตัว) จึงปัดเป็น 78</div>
+      </div>
+      <div class="ex-item" onclick="toggleAns(this)">
+        <div class="ex-q"><span class="ex-num">9.</span> 1.234 × 2.0 × 3.11 = ?</div>
+        <div class="ex-ans">7.7 — ผลคูณดิบ = 7.678... แต่ 2.0 มีนัยสำคัญน้อยสุด (2 ตัว) จึงปัดเป็น 7.7</div>
+      </div>
+    </div>
+
+    <!-- หมวด 4: การปัดเลข -->
+    <p class="ex-group-label">หมวด 4 — การปัดเลข</p>
+    <div class="ex-list">
+      <div class="ex-item" onclick="toggleAns(this)">
+        <div class="ex-q"><span class="ex-num">10.</span> ปัด 4.8650 ให้ได้ 3 นัยสำคัญ</div>
+        <div class="ex-ans">4.86 — ดูตัวที่ 4 = 5 เท่านั้น ตัวก่อนหน้า (6) เป็นเลขคู่ → คงไว้ (Banker's rounding)</div>
+      </div>
+      <div class="ex-item" onclick="toggleAns(this)">
+        <div class="ex-q"><span class="ex-num">11.</span> ปัด 0.025351 ให้ได้ 3 นัยสำคัญ</div>
+        <div class="ex-ans">0.0254 — นัยสำคัญ 3 ตัวคือ 2, 5, 3 แล้วดูตัวถัดไป = 5 และมีเลข 1 ตามหลัง → ปัดขึ้น ได้ 0.0254</div>
+      </div>
+      <div class="ex-item" onclick="toggleAns(this)">
+        <div class="ex-q"><span class="ex-num">12.</span> ปัด 9995 ให้ได้ 2 นัยสำคัญ</div>
+        <div class="ex-ans">10000 (= 1.0 × 10⁴) — นัยสำคัญ 2 ตัวแรกคือ 9, 9 ดูตัวถัดไป = 9 > 5 ปัดขึ้น ได้ 10000 ซึ่งต้องเขียนเป็น 1.0 × 10⁴ จึงจะชัดเจน</div>
+      </div>
+    </div>
+
+    <!-- หมวด 5: กราฟและความชัน -->
+    <p class="ex-group-label">หมวด 5 — กราฟและความชัน</p>
+    <div class="ex-list">
+      <div class="ex-item" onclick="toggleAns(this)">
+        <div class="ex-q"><span class="ex-num">13.</span> เส้นตรงผ่าน (2, 5) และ (8, 17) ความชันเท่าไร?</div>
+        <div class="ex-ans">m = 2.0 — Δy = 17−5 = 12, Δx = 8−2 = 6, m = 12/6 = 2.0 (2 นัยสำคัญ เพราะ 6 มี 1 นัยสำคัญ… แต่ถ้าถือว่าตัวเลขเป็นจำนวนเต็มแน่นอน ตอบ m = 2.0)</div>
+      </div>
+      <div class="ex-item" onclick="toggleAns(this)">
+        <div class="ex-q"><span class="ex-num">14.</span> y = −3x + 6 ตัดแกน X และแกน Y ที่จุดใด?</div>
+        <div class="ex-ans">ตัดแกน Y ที่ (0, 6): แทน x=0 → y=6 | ตัดแกน X ที่ (2, 0): แทน y=0 → 0=−3x+6 → x=2</div>
+      </div>
+      <div class="ex-item" onclick="toggleAns(this)">
+        <div class="ex-q"><span class="ex-num">15.</span> Δy = 8.4 และ Δx = 2.10 ความชันมีกี่นัยสำคัญ?</div>
+        <div class="ex-ans">2 นัยสำคัญ — m = 8.4/2.10 = 4.0 เพราะ 8.4 มีนัยสำคัญน้อยกว่า (2 ตัว) ผลหารจึงมีได้แค่ 2 ตัว</div>
+      </div>
+    </div>
+
+    <!-- หมวด 6: ความคลาดเคลื่อน -->
+    <p class="ex-group-label">หมวด 6 — ความคลาดเคลื่อน</p>
+    <div class="ex-list">
+      <div class="ex-item" onclick="toggleAns(this)">
+        <div class="ex-q"><span class="ex-num">16.</span> (12.0 ± 0.5) + (3.5 ± 0.2) = ?</div>
+        <div class="ex-ans">(12.0+3.5) ± (0.5+0.2) = <strong>15.5 ± 0.7</strong></div>
+      </div>
+      <div class="ex-item" onclick="toggleAns(this)">
+        <div class="ex-q"><span class="ex-num">17.</span> (5.0 ± 0.1) × (4.0 ± 0.2) = ?</div>
+        <div class="ex-ans">AB = 20.0 | Ab+Ba = (5.0)(0.2)+(4.0)(0.1) = 1.0+0.4 = 1.4 → <strong>20.0 ± 1.4</strong></div>
+      </div>
+      <div class="ex-item" onclick="toggleAns(this)">
+        <div class="ex-q"><span class="ex-num">18.</span> (9.0 ± 0.3) ÷ (3.0 ± 0.3) = ?</div>
+        <div class="ex-ans">A/B = 3.0 | a/A+b/B = 0.3/9.0+0.3/3.0 = 0.033+0.1 = 0.133 | ความคลาดเคลื่อน = 0.133×3.0 = 0.4 → <strong>3.0 ± 0.4</strong></div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  function toggleAns(el) { el.classList.toggle('open'); }
+
+  // ─── Graph ───
+  const canvas = document.getElementById('lineChart');
+  const ctx = canvas.getContext('2d');
+
+  function drawGraph() {
+    const W = canvas.offsetWidth; const H = 240;
+    canvas.width = W; canvas.height = H;
+    const m = parseFloat(document.getElementById('slopeRange').value);
+    const c = parseFloat(document.getElementById('interceptRange').value);
+    document.getElementById('mVal').textContent = m;
+    document.getElementById('cVal').textContent = c;
+    const sign = c >= 0 ? '+' : '−';
+    document.getElementById('eqDisplay').textContent = `y = ${m}x ${sign} ${Math.abs(c)}`;
+
+    const pad = {top:20,right:20,bottom:32,left:38};
+    const pw = W-pad.left-pad.right, ph = H-pad.top-pad.bottom;
+    const xMin=-6,xMax=6,yMin=-8,yMax=8;
+    const tx = x => pad.left+((x-xMin)/(xMax-xMin))*pw;
+    const ty = y => pad.top+((yMax-y)/(yMax-yMin))*ph;
+
+    ctx.fillStyle='#f5f5f5'; ctx.fillRect(0,0,W,H);
+
+    // grid
+    ctx.strokeStyle='#dddddd'; ctx.lineWidth=1;
+    for(let x=xMin;x<=xMax;x++){ctx.beginPath();ctx.moveTo(tx(x),pad.top);ctx.lineTo(tx(x),pad.top+ph);ctx.stroke();}
+    for(let y=yMin;y<=yMax;y++){ctx.beginPath();ctx.moveTo(pad.left,ty(y));ctx.lineTo(pad.left+pw,ty(y));ctx.stroke();}
+
+    // axes
+    ctx.strokeStyle='#999'; ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(pad.left,ty(0));ctx.lineTo(pad.left+pw,ty(0));ctx.stroke();
+    ctx.beginPath();ctx.moveTo(tx(0),pad.top);ctx.lineTo(tx(0),pad.top+ph);ctx.stroke();
+
+    // labels
+    ctx.fillStyle='#888'; ctx.font='10px IBM Plex Mono,monospace'; ctx.textAlign='center';
+    for(let x=xMin+1;x<=xMax-1;x++) if(x!==0) ctx.fillText(x,tx(x),ty(0)+14);
+    ctx.textAlign='right';
+    for(let y=yMin+1;y<=yMax-1;y++) if(y!==0) ctx.fillText(y,tx(0)-5,ty(y)+4);
+
+    // Δ triangle between x=1 and x=3
+    const x1t=1,x2t=3,y1t=m*x1t+c,y2t=m*x2t+c;
+    if(y1t>=yMin&&y1t<=yMax&&y2t>=yMin&&y2t<=yMax){
+      ctx.setLineDash([4,3]); ctx.strokeStyle='#aaa'; ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(tx(x2t),ty(y1t));ctx.lineTo(tx(x2t),ty(y2t));ctx.stroke();
+      ctx.beginPath();ctx.moveTo(tx(x1t),ty(y1t));ctx.lineTo(tx(x2t),ty(y1t));ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle='#555'; ctx.font='10px IBM Plex Mono,monospace';
+      ctx.textAlign='center'; ctx.fillText('Δx',tx((x1t+x2t)/2),ty(y1t)+14);
+      ctx.textAlign='left'; ctx.fillText('Δy',tx(x2t)+4,ty((y1t+y2t)/2)+4);
+    }
+
+    // line
+    ctx.strokeStyle='#111'; ctx.lineWidth=2; ctx.setLineDash([]);
+    ctx.beginPath();
+    if(m===0){ctx.moveTo(tx(xMin),ty(c));ctx.lineTo(tx(xMax),ty(c));}
+    else{
+      const xL=Math.max(xMin,Math.min(xMax,(yMin-c)/m));
+      const xR=Math.max(xMin,Math.min(xMax,(yMax-c)/m));
+      ctx.moveTo(tx(xL),ty(m*xL+c));ctx.lineTo(tx(xR),ty(m*xR+c));
+    }
+    ctx.stroke();
+
+    // y-intercept
+    if(c>=yMin&&c<=yMax){
+      ctx.fillStyle='#111'; ctx.beginPath(); ctx.arc(tx(0),ty(c),4,0,Math.PI*2); ctx.fill();
+      ctx.font='10px IBM Plex Mono,monospace'; ctx.textAlign='left'; ctx.fillStyle='#333';
+      ctx.fillText(`(0,${c})`,tx(0)+7,ty(c)-5);
+    }
+    // x-intercept
+    if(m!==0){const xi=-c/m; if(xi>=xMin&&xi<=xMax){
+      ctx.fillStyle='#555'; ctx.beginPath(); ctx.arc(tx(xi),ty(0),4,0,Math.PI*2); ctx.fill();
+      ctx.textAlign='center'; ctx.fillStyle='#333';
+      ctx.fillText(`(${+xi.toFixed(2)},0)`,tx(xi),ty(0)-9);
+    }}
+  }
+
+  document.getElementById('slopeRange').addEventListener('input', drawGraph);
+  document.getElementById('interceptRange').addEventListener('input', drawGraph);
+  window.addEventListener('resize', drawGraph);
+  drawGraph();
+
+  // ─── Error calc ───
+  function calcError() {
+    const A=parseFloat(document.getElementById('x0').value)||0;
+    const a=Math.abs(parseFloat(document.getElementById('dx').value)||0);
+    const B=parseFloat(document.getElementById('y0').value)||0;
+    const b=Math.abs(parseFloat(document.getElementById('dy').value)||0);
+    const op=document.getElementById('opSelect').value;
+    const box=document.getElementById('errResult');
+    let z,dz,formula,step;
+    if(op==='add'){z=A+B;dz=a+b;formula=`(${A} ± ${a}) + (${B} ± ${b})`;step=`a + b = ${a} + ${b} = ${dz.toPrecision(2)}`;}
+    else if(op==='sub'){z=A-B;dz=a+b;formula=`(${A} ± ${a}) − (${B} ± ${b})`;step=`a + b = ${a} + ${b} = ${dz.toPrecision(2)}`;}
+    else if(op==='mul'){z=A*B;dz=Math.abs(A)*b+Math.abs(B)*a;formula=`(${A} ± ${a})(${B} ± ${b})`;step=`Ab + Ba = ${A}×${b} + ${B}×${a} = ${dz.toPrecision(2)}`;}
+    else{if(!B){box.innerHTML='<span style="color:#c00">ไม่สามารถหารด้วยศูนย์</span>';return;}z=A/B;dz=Math.abs(z)*(( A?a/Math.abs(A):0)+b/Math.abs(B));formula=`(${A} ± ${a}) ÷ (${B} ± ${b})`;step=`(a/A + b/B)×(A/B) = (${A?a/Math.abs(A):0}+${(b/Math.abs(B)).toPrecision(2)})×${+(A/B).toPrecision(3)}`;}
+    const s=n=>parseFloat(n.toPrecision(2));
+    box.innerHTML=`<span style="color:#555;font-size:0.76rem;">${formula}</span><br><span style="color:#555;font-size:0.76rem;">${step}</span><br><strong>= ${s(z)} ± ${s(dz)}</strong>`;
+  }
+  ['x0','dx','y0','dy','opSelect'].forEach(id=>document.getElementById(id).addEventListener('input',calcError));
+  calcError();
+</script>
+</body>
 </html>
