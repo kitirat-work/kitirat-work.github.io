@@ -449,6 +449,7 @@
     .ex-q::after { content: '▸'; margin-left: auto; font-size: 0.7rem; color: var(--light); transition: transform 0.15s; flex-shrink: 0; }
     .ex-item.open .ex-q::after { transform: rotate(90deg); }
     .ex-num { font-family: var(--mono); font-size: 0.75rem; color: var(--light); flex-shrink: 0; }
+    .ex-arrow { display: none; } /* arrow handled by ::after */
     .ex-ans {
       display: none;
       padding: 0.5rem 0.85rem 0.6rem 2rem;
@@ -458,7 +459,41 @@
       line-height: 1.6;
     }
     .ex-item.open .ex-ans { display: block; }
-    @media print { .ex-ans { display: block !important; } .ex-q::after { display: none; } }
+
+    /* Answer key — hidden on screen, shown on print */
+    .answer-key {
+      display: none;
+    }
+    .ak-header {
+      border-top: 3px solid var(--text);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 0 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+    .ak-group { margin-bottom: 1rem; }
+    .ak-row {
+      display: grid;
+      grid-template-columns: 28px 160px 1fr;
+      gap: 0.4rem;
+      padding: 0.35rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.84rem;
+      align-items: baseline;
+    }
+    .ak-row:last-child { border-bottom: none; }
+    .ak-num { font-family: var(--mono); font-size: 0.72rem; color: var(--light); }
+    .ak-q { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); }
+    .ak-a { color: var(--text); }
+
+    @media print {
+      .ex-ans.no-print { display: none !important; }
+      .ex-q::after { display: none; }
+      .answer-key {
+        display: block;
+        page-break-before: always;
+        padding-top: 0;
+      }
+    }
 
     /* ─── PRINT STYLES ─── */
     @media print {
@@ -903,110 +938,160 @@
   <section style="margin-top:1.5rem;">
     <div class="section-tag">07 — แบบฝึกหัด</div>
     <h2>แบบฝึกหัด</h2>
-    <p style="font-size:0.82rem;color:var(--muted);margin-bottom:1rem;">กดที่ข้อเพื่อดูเฉลย</p>
+    <p style="font-size:0.82rem;color:var(--muted);margin-bottom:1rem;">กดที่ข้อเพื่อดูเฉลย — เมื่อสั่งพิมพ์ เฉลยจะแยกไปอีกหน้า</p>
 
-    <!-- หมวด 1: กฎการนับ -->
+    <!-- หมวด 1 -->
     <p class="ex-group-label">หมวด 1 — กฎการนับนัยสำคัญ</p>
     <div class="ex-list">
       <div class="ex-item" onclick="toggleAns(this)">
-        <div class="ex-q"><span class="ex-num">1.</span> 0.00420 มีกี่นัยสำคัญ?</div>
-        <div class="ex-ans">3 นัยสำคัญ — ตัวเลขที่นับคือ 4, 2, 0 (ศูนย์นำหน้าไม่นับ แต่ศูนย์ท้ายทศนิยมนับ)</div>
+        <div class="ex-q"><span class="ex-num">1.</span> 0.00420 มีกี่นัยสำคัญ?<span class="ex-arrow">▸</span></div>
+        <div class="ex-ans no-print">3 นัยสำคัญ — 4, 2, 0 (ศูนย์นำหน้าไม่นับ แต่ศูนย์ท้ายทศนิยมนับ)</div>
       </div>
       <div class="ex-item" onclick="toggleAns(this)">
-        <div class="ex-q"><span class="ex-num">2.</span> 3.060 × 10² มีกี่นัยสำคัญ?</div>
-        <div class="ex-ans">4 นัยสำคัญ — 3, 0, 6, 0 (ศูนย์ระหว่างตัวเลขนับ และศูนย์ท้ายทศนิยมนับ)</div>
+        <div class="ex-q"><span class="ex-num">2.</span> 3.060 × 10² มีกี่นัยสำคัญ?<span class="ex-arrow">▸</span></div>
+        <div class="ex-ans no-print">4 นัยสำคัญ — 3, 0, 6, 0 (ศูนย์ระหว่างตัวเลขนับ และศูนย์ท้ายทศนิยมนับ)</div>
       </div>
       <div class="ex-item" onclick="toggleAns(this)">
-        <div class="ex-q"><span class="ex-num">3.</span> 120500 มีกี่นัยสำคัญ?</div>
-        <div class="ex-ans">6 นัยสำคัญ — 1, 2, 0, 5, 0, 0 ทุกตัวนับเมื่อเขียนเป็นจำนวนเต็มโดยตรง (ถ้าต้องการน้อยกว่านี้ต้องใช้สัญกรณ์วิทยาศาสตร์)</div>
+        <div class="ex-q"><span class="ex-num">3.</span> 120500 มีกี่นัยสำคัญ?<span class="ex-arrow">▸</span></div>
+        <div class="ex-ans no-print">6 นัยสำคัญ — 1, 2, 0, 5, 0, 0 ทุกตัวนับเมื่อเขียนตรงๆ (ถ้าต้องการน้อยกว่าใช้สัญกรณ์วิทยาศาสตร์)</div>
       </div>
     </div>
 
-    <!-- หมวด 2: บวก/ลบ -->
+    <!-- หมวด 2 -->
     <p class="ex-group-label">หมวด 2 — การบวกและลบ</p>
     <div class="ex-list">
       <div class="ex-item" onclick="toggleAns(this)">
-        <div class="ex-q"><span class="ex-num">4.</span> 13.5 + 2.46 + 0.135 = ?</div>
-        <div class="ex-ans">16.1 — ผลรวมดิบ = 16.095 แต่ 13.5 มีทศนิยมน้อยสุด (1 ตำแหน่ง) จึงปัดเป็น 16.1</div>
+        <div class="ex-q"><span class="ex-num">4.</span> 13.5 + 2.46 + 0.135 = ?<span class="ex-arrow">▸</span></div>
+        <div class="ex-ans no-print">16.1 — ผลรวมดิบ = 16.095 แต่ 13.5 มีทศนิยมน้อยสุด (1 ตำแหน่ง) จึงปัดเป็น 16.1</div>
       </div>
       <div class="ex-item" onclick="toggleAns(this)">
-        <div class="ex-q"><span class="ex-num">5.</span> 200.0 − 18.36 = ?</div>
-        <div class="ex-ans">181.6 — ผลลบดิบ = 181.64 แต่ 200.0 มีทศนิยม 1 ตำแหน่ง จึงปัดเป็น 181.6</div>
+        <div class="ex-q"><span class="ex-num">5.</span> 200.0 − 18.36 = ?<span class="ex-arrow">▸</span></div>
+        <div class="ex-ans no-print">181.6 — ผลลบดิบ = 181.64 แต่ 200.0 มีทศนิยม 1 ตำแหน่ง จึงปัดเป็น 181.6</div>
       </div>
       <div class="ex-item" onclick="toggleAns(this)">
-        <div class="ex-q"><span class="ex-num">6.</span> 1.002 + 0.0040 = ?</div>
-        <div class="ex-ans">1.006 — ผลรวมดิบ = 1.0060 แต่ 1.002 มีทศนิยม 3 ตำแหน่ง (น้อยสุด) จึงปัดเป็น 1.006</div>
+        <div class="ex-q"><span class="ex-num">6.</span> 1.002 + 0.0040 = ?<span class="ex-arrow">▸</span></div>
+        <div class="ex-ans no-print">1.006 — ผลรวมดิบ = 1.0060 แต่ 1.002 มีทศนิยม 3 ตำแหน่ง (น้อยสุด) จึงปัดเป็น 1.006</div>
       </div>
     </div>
 
-    <!-- หมวด 3: คูณ/หาร -->
+    <!-- หมวด 3 -->
     <p class="ex-group-label">หมวด 3 — การคูณและหาร</p>
     <div class="ex-list">
       <div class="ex-item" onclick="toggleAns(this)">
-        <div class="ex-q"><span class="ex-num">7.</span> 2.5 × 3.42 = ?</div>
-        <div class="ex-ans">8.6 — ผลคูณดิบ = 8.55 แต่ 2.5 มีนัยสำคัญน้อยสุด (2 ตัว) จึงปัดเป็น 8.6</div>
+        <div class="ex-q"><span class="ex-num">7.</span> 2.5 × 3.42 = ?<span class="ex-arrow">▸</span></div>
+        <div class="ex-ans no-print">8.6 — ผลคูณดิบ = 8.55 แต่ 2.5 มีนัยสำคัญน้อยสุด (2 ตัว) จึงปัดเป็น 8.6</div>
       </div>
       <div class="ex-item" onclick="toggleAns(this)">
-        <div class="ex-q"><span class="ex-num">8.</span> 6.24 ÷ 0.080 = ?</div>
-        <div class="ex-ans">78 — ผลหารดิบ = 78.0 แต่ 0.080 มีนัยสำคัญน้อยสุด (2 ตัว) จึงปัดเป็น 78</div>
+        <div class="ex-q"><span class="ex-num">8.</span> 6.24 ÷ 0.080 = ?<span class="ex-arrow">▸</span></div>
+        <div class="ex-ans no-print">78 — ผลหารดิบ = 78.0 แต่ 0.080 มีนัยสำคัญน้อยสุด (2 ตัว) จึงปัดเป็น 78</div>
       </div>
       <div class="ex-item" onclick="toggleAns(this)">
-        <div class="ex-q"><span class="ex-num">9.</span> 1.234 × 2.0 × 3.11 = ?</div>
-        <div class="ex-ans">7.7 — ผลคูณดิบ = 7.678... แต่ 2.0 มีนัยสำคัญน้อยสุด (2 ตัว) จึงปัดเป็น 7.7</div>
+        <div class="ex-q"><span class="ex-num">9.</span> 1.234 × 2.0 × 3.11 = ?<span class="ex-arrow">▸</span></div>
+        <div class="ex-ans no-print">7.7 — ผลคูณดิบ = 7.678... แต่ 2.0 มีนัยสำคัญน้อยสุด (2 ตัว) จึงปัดเป็น 7.7</div>
       </div>
     </div>
 
-    <!-- หมวด 4: การปัดเลข -->
+    <!-- หมวด 4 -->
     <p class="ex-group-label">หมวด 4 — การปัดเลข</p>
     <div class="ex-list">
       <div class="ex-item" onclick="toggleAns(this)">
-        <div class="ex-q"><span class="ex-num">10.</span> ปัด 4.8650 ให้ได้ 3 นัยสำคัญ</div>
-        <div class="ex-ans">4.86 — ดูตัวที่ 4 = 5 เท่านั้น ตัวก่อนหน้า (6) เป็นเลขคู่ → คงไว้ (Banker's rounding)</div>
+        <div class="ex-q"><span class="ex-num">10.</span> ปัด 4.8650 ให้ได้ 3 นัยสำคัญ<span class="ex-arrow">▸</span></div>
+        <div class="ex-ans no-print">4.86 — ดูตัวที่ 4 = 5 เท่านั้น ตัวก่อนหน้า (6) เป็นเลขคู่ → คงไว้ (Banker's rounding)</div>
       </div>
       <div class="ex-item" onclick="toggleAns(this)">
-        <div class="ex-q"><span class="ex-num">11.</span> ปัด 0.025351 ให้ได้ 3 นัยสำคัญ</div>
-        <div class="ex-ans">0.0254 — นัยสำคัญ 3 ตัวคือ 2, 5, 3 แล้วดูตัวถัดไป = 5 และมีเลข 1 ตามหลัง → ปัดขึ้น ได้ 0.0254</div>
+        <div class="ex-q"><span class="ex-num">11.</span> ปัด 0.025351 ให้ได้ 3 นัยสำคัญ<span class="ex-arrow">▸</span></div>
+        <div class="ex-ans no-print">0.0254 — 3 ตัวคือ 2, 5, 3 ดูตัวถัดไป = 5 มีเลข 1 ตาม → ปัดขึ้น ได้ 0.0254</div>
       </div>
       <div class="ex-item" onclick="toggleAns(this)">
-        <div class="ex-q"><span class="ex-num">12.</span> ปัด 9995 ให้ได้ 2 นัยสำคัญ</div>
-        <div class="ex-ans">10000 (= 1.0 × 10⁴) — นัยสำคัญ 2 ตัวแรกคือ 9, 9 ดูตัวถัดไป = 9 > 5 ปัดขึ้น ได้ 10000 ซึ่งต้องเขียนเป็น 1.0 × 10⁴ จึงจะชัดเจน</div>
+        <div class="ex-q"><span class="ex-num">12.</span> ปัด 9995 ให้ได้ 2 นัยสำคัญ<span class="ex-arrow">▸</span></div>
+        <div class="ex-ans no-print">1.0 × 10⁴ — ปัดขึ้นได้ 10000 ต้องเขียนเป็น 1.0 × 10⁴ ถึงจะชัดว่ามี 2 นัยสำคัญ</div>
       </div>
     </div>
 
-    <!-- หมวด 5: กราฟและความชัน -->
+    <!-- หมวด 5 -->
     <p class="ex-group-label">หมวด 5 — กราฟและความชัน</p>
     <div class="ex-list">
       <div class="ex-item" onclick="toggleAns(this)">
-        <div class="ex-q"><span class="ex-num">13.</span> เส้นตรงผ่าน (2, 5) และ (8, 17) ความชันเท่าไร?</div>
-        <div class="ex-ans">m = 2.0 — Δy = 17−5 = 12, Δx = 8−2 = 6, m = 12/6 = 2.0 (2 นัยสำคัญ เพราะ 6 มี 1 นัยสำคัญ… แต่ถ้าถือว่าตัวเลขเป็นจำนวนเต็มแน่นอน ตอบ m = 2.0)</div>
+        <div class="ex-q"><span class="ex-num">13.</span> เส้นตรงผ่าน (2, 5) และ (8, 17) ความชันเท่าไร?<span class="ex-arrow">▸</span></div>
+        <div class="ex-ans no-print">m = 2.0 — Δy = 17−5 = 12, Δx = 8−2 = 6, m = 12/6 = 2.0</div>
       </div>
       <div class="ex-item" onclick="toggleAns(this)">
-        <div class="ex-q"><span class="ex-num">14.</span> y = −3x + 6 ตัดแกน X และแกน Y ที่จุดใด?</div>
-        <div class="ex-ans">ตัดแกน Y ที่ (0, 6): แทน x=0 → y=6 | ตัดแกน X ที่ (2, 0): แทน y=0 → 0=−3x+6 → x=2</div>
+        <div class="ex-q"><span class="ex-num">14.</span> y = −3x + 6 ตัดแกน X และแกน Y ที่จุดใด?<span class="ex-arrow">▸</span></div>
+        <div class="ex-ans no-print">ตัดแกน Y ที่ (0, 6) — แทน x=0 | ตัดแกน X ที่ (2, 0) — แทน y=0 แล้วแก้สมการ</div>
       </div>
       <div class="ex-item" onclick="toggleAns(this)">
-        <div class="ex-q"><span class="ex-num">15.</span> Δy = 8.4 และ Δx = 2.10 ความชันมีกี่นัยสำคัญ?</div>
-        <div class="ex-ans">2 นัยสำคัญ — m = 8.4/2.10 = 4.0 เพราะ 8.4 มีนัยสำคัญน้อยกว่า (2 ตัว) ผลหารจึงมีได้แค่ 2 ตัว</div>
+        <div class="ex-q"><span class="ex-num">15.</span> Δy = 8.4 และ Δx = 2.10 ความชันมีกี่นัยสำคัญ?<span class="ex-arrow">▸</span></div>
+        <div class="ex-ans no-print">2 นัยสำคัญ — m = 8.4/2.10 = 4.0 เพราะ 8.4 มีนัยสำคัญน้อยกว่า (2 ตัว)</div>
       </div>
     </div>
 
-    <!-- หมวด 6: ความคลาดเคลื่อน -->
+    <!-- หมวด 6 -->
     <p class="ex-group-label">หมวด 6 — ความคลาดเคลื่อน</p>
     <div class="ex-list">
       <div class="ex-item" onclick="toggleAns(this)">
-        <div class="ex-q"><span class="ex-num">16.</span> (12.0 ± 0.5) + (3.5 ± 0.2) = ?</div>
-        <div class="ex-ans">(12.0+3.5) ± (0.5+0.2) = <strong>15.5 ± 0.7</strong></div>
+        <div class="ex-q"><span class="ex-num">16.</span> (12.0 ± 0.5) + (3.5 ± 0.2) = ?<span class="ex-arrow">▸</span></div>
+        <div class="ex-ans no-print">(12.0+3.5) ± (0.5+0.2) = <strong>15.5 ± 0.7</strong></div>
       </div>
       <div class="ex-item" onclick="toggleAns(this)">
-        <div class="ex-q"><span class="ex-num">17.</span> (5.0 ± 0.1) × (4.0 ± 0.2) = ?</div>
-        <div class="ex-ans">AB = 20.0 | Ab+Ba = (5.0)(0.2)+(4.0)(0.1) = 1.0+0.4 = 1.4 → <strong>20.0 ± 1.4</strong></div>
+        <div class="ex-q"><span class="ex-num">17.</span> (5.0 ± 0.1) × (4.0 ± 0.2) = ?<span class="ex-arrow">▸</span></div>
+        <div class="ex-ans no-print">AB = 20.0 | Ab+Ba = (5.0)(0.2)+(4.0)(0.1) = 1.0+0.4 = 1.4 → <strong>20.0 ± 1.4</strong></div>
       </div>
       <div class="ex-item" onclick="toggleAns(this)">
-        <div class="ex-q"><span class="ex-num">18.</span> (9.0 ± 0.3) ÷ (3.0 ± 0.3) = ?</div>
-        <div class="ex-ans">A/B = 3.0 | a/A+b/B = 0.3/9.0+0.3/3.0 = 0.033+0.1 = 0.133 | ความคลาดเคลื่อน = 0.133×3.0 = 0.4 → <strong>3.0 ± 0.4</strong></div>
+        <div class="ex-q"><span class="ex-num">18.</span> (9.0 ± 0.3) ÷ (3.0 ± 0.3) = ?<span class="ex-arrow">▸</span></div>
+        <div class="ex-ans no-print">A/B = 3.0 | a/A+b/B = 0.033+0.1 = 0.133 | ความคลาดเคลื่อน = 0.133×3.0 = 0.4 → <strong>3.0 ± 0.4</strong></div>
       </div>
     </div>
   </section>
+
+  <!-- เฉลย (พิมพ์แยกหน้า) -->
+  <div class="answer-key">
+    <div class="ak-header">
+      <div class="hero-label" style="margin-bottom:0.3rem;">เลขนัยสำคัญ — เฉลยแบบฝึกหัด</div>
+      <h2 style="font-size:1.1rem;border:none;padding:0;">เฉลย</h2>
+    </div>
+
+    <div class="ak-group">
+      <p class="ex-group-label" style="margin-top:0;">หมวด 1 — กฎการนับนัยสำคัญ</p>
+      <div class="ak-row"><span class="ak-num">1.</span><span class="ak-q">0.00420</span><span class="ak-a"><strong>3</strong> นัยสำคัญ — 4, 2, 0 (ศูนย์นำหน้าไม่นับ ศูนย์ท้ายทศนิยมนับ)</span></div>
+      <div class="ak-row"><span class="ak-num">2.</span><span class="ak-q">3.060 × 10²</span><span class="ak-a"><strong>4</strong> นัยสำคัญ — 3, 0, 6, 0</span></div>
+      <div class="ak-row"><span class="ak-num">3.</span><span class="ak-q">120500</span><span class="ak-a"><strong>6</strong> นัยสำคัญ — 1, 2, 0, 5, 0, 0 (ศูนย์ท้ายจำนวนเต็มนับเสมอ)</span></div>
+    </div>
+
+    <div class="ak-group">
+      <p class="ex-group-label">หมวด 2 — การบวกและลบ</p>
+      <div class="ak-row"><span class="ak-num">4.</span><span class="ak-q">13.5 + 2.46 + 0.135</span><span class="ak-a"><strong>16.1</strong> (ดูทศนิยม 13.5 น้อยสุด 1 ตำแหน่ง)</span></div>
+      <div class="ak-row"><span class="ak-num">5.</span><span class="ak-q">200.0 − 18.36</span><span class="ak-a"><strong>181.6</strong> (200.0 มีทศนิยม 1 ตำแหน่ง)</span></div>
+      <div class="ak-row"><span class="ak-num">6.</span><span class="ak-q">1.002 + 0.0040</span><span class="ak-a"><strong>1.006</strong> (1.002 มีทศนิยม 3 ตำแหน่ง น้อยสุด)</span></div>
+    </div>
+
+    <div class="ak-group">
+      <p class="ex-group-label">หมวด 3 — การคูณและหาร</p>
+      <div class="ak-row"><span class="ak-num">7.</span><span class="ak-q">2.5 × 3.42</span><span class="ak-a"><strong>8.6</strong> (2.5 มี 2 นัยสำคัญ น้อยสุด)</span></div>
+      <div class="ak-row"><span class="ak-num">8.</span><span class="ak-q">6.24 ÷ 0.080</span><span class="ak-a"><strong>78</strong> (0.080 มี 2 นัยสำคัญ น้อยสุด)</span></div>
+      <div class="ak-row"><span class="ak-num">9.</span><span class="ak-q">1.234 × 2.0 × 3.11</span><span class="ak-a"><strong>7.7</strong> (2.0 มี 2 นัยสำคัญ น้อยสุด)</span></div>
+    </div>
+
+    <div class="ak-group">
+      <p class="ex-group-label">หมวด 4 — การปัดเลข</p>
+      <div class="ak-row"><span class="ak-num">10.</span><span class="ak-q">4.8650 → 3 นัยสำคัญ</span><span class="ak-a"><strong>4.86</strong> (ตัวที่ 4 = 5 เท่านั้น 6 เป็นเลขคู่ คงไว้ — Banker's)</span></div>
+      <div class="ak-row"><span class="ak-num">11.</span><span class="ak-q">0.025351 → 3 นัยสำคัญ</span><span class="ak-a"><strong>0.0254</strong> (ตัวที่ 4 = 5 มีเลขตาม ปัดขึ้น)</span></div>
+      <div class="ak-row"><span class="ak-num">12.</span><span class="ak-q">9995 → 2 นัยสำคัญ</span><span class="ak-a"><strong>1.0 × 10⁴</strong> (ปัดขึ้น ต้องเขียนสัญกรณ์วิทยาศาสตร์)</span></div>
+    </div>
+
+    <div class="ak-group">
+      <p class="ex-group-label">หมวด 5 — กราฟและความชัน</p>
+      <div class="ak-row"><span class="ak-num">13.</span><span class="ak-q">(2,5) และ (8,17)</span><span class="ak-a"><strong>m = 2.0</strong> (Δy=12, Δx=6, m=12/6=2.0)</span></div>
+      <div class="ak-row"><span class="ak-num">14.</span><span class="ak-q">y = −3x + 6</span><span class="ak-a">ตัดแกน Y ที่ <strong>(0, 6)</strong> / ตัดแกน X ที่ <strong>(2, 0)</strong></span></div>
+      <div class="ak-row"><span class="ak-num">15.</span><span class="ak-q">Δy=8.4, Δx=2.10</span><span class="ak-a"><strong>2 นัยสำคัญ</strong> m = 4.0 (8.4 มี 2 นัยสำคัญ น้อยสุด)</span></div>
+    </div>
+
+    <div class="ak-group">
+      <p class="ex-group-label">หมวด 6 — ความคลาดเคลื่อน</p>
+      <div class="ak-row"><span class="ak-num">16.</span><span class="ak-q">(12.0±0.5)+(3.5±0.2)</span><span class="ak-a"><strong>15.5 ± 0.7</strong></span></div>
+      <div class="ak-row"><span class="ak-num">17.</span><span class="ak-q">(5.0±0.1)×(4.0±0.2)</span><span class="ak-a"><strong>20.0 ± 1.4</strong> (Ab+Ba = 1.0+0.4)</span></div>
+      <div class="ak-row"><span class="ak-num">18.</span><span class="ak-q">(9.0±0.3)÷(3.0±0.3)</span><span class="ak-a"><strong>3.0 ± 0.4</strong> (relative error = 0.133, ×3.0)</span></div>
+    </div>
+  </div>
 
 </div>
 
