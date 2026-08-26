@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DLQ & Retry — ฉบับเข้าใจง่าย</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/black.css" />
+  <style>
+    :root {
+      --accent: #6366f1;
+      --accent-light: #818cf8;
+      --warn: #f59e0b;
+      --danger: #ef4444;
+      --success: #22c55e;
+    }
+
+    .reveal {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans Thai", sans-serif;
+    }
+
+    .reveal h1, .reveal h2, .reveal h3 {
+      letter-spacing: -0.02em;
+      text-transform: none;
+    }
+
+    .reveal h2 { color: var(--accent-light); font-size: 1.3em; }
+
+    .reveal code {
+      background: rgba(99,102,241,0.2);
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-size: 0.82em;
+      color: #c7d2fe;
+    }
+
+    .tag {
+      display: inline-block;
+      background: rgba(99,102,241,0.18);
+      color: var(--accent-light);
+      border-radius: 4px;
+      padding: 3px 10px;
+      font-size: 0.55em;
+      font-weight: 600;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+
+    .box {
+      background: rgba(255,255,255,0.05);
+      border-radius: 8px;
+      padding: 0.8em 1.1em;
+      text-align: left;
+      font-size: 0.78em;
+      line-height: 1.65;
+    }
+
+    .box.accent  { border-left: 3px solid var(--accent); }
+    .box.warn    { border-left: 3px solid var(--warn); }
+    .box.danger  { border-left: 3px solid var(--danger); }
+    .box.success { border-left: 3px solid var(--success); }
+
+    /* Two-column grid */
+    .col2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.8em;
+      margin-top: 0.6em;
+    }
+
+    /* Three-column grid */
+    .col3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 0.6em;
+      margin-top: 0.6em;
+    }
+
+    /* Info card */
+    .card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(99,102,241,0.25);
+      border-radius: 8px;
+      padding: 0.7em 0.9em;
+      font-size: 0.65em;
+      text-align: left;
+      line-height: 1.6;
+    }
+
+    .card .icon { font-size: 1.4em; margin-bottom: 0.2em; display: block; }
+    .card strong { color: var(--accent-light); display: block; margin-bottom: 0.2em; }
+    .card.danger { border-color: rgba(239,68,68,0.35); }
+    .card.success { border-color: rgba(34,197,94,0.35); }
+
+    /* Broker table */
+    .broker-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.62em;
+      margin-top: 0.5em;
+    }
+
+    .broker-table th {
+      background: rgba(99,102,241,0.3);
+      padding: 0.55em 0.8em;
+      text-align: left;
+      font-weight: 600;
+    }
+
+    .broker-table td {
+      padding: 0.55em 0.8em;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      vertical-align: top;
+      line-height: 1.5;
+    }
+
+    .broker-table tr:last-child td { border-bottom: none; }
+
+    .broker-name {
+      font-weight: 700;
+      color: var(--warn);
+      white-space: nowrap;
+    }
+
+    /* Bar chart */
+    .chart-wrap {
+      margin: 0.5em auto 0;
+      width: 100%;
+      max-width: 560px;
+    }
+
+    .chart-bars {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 10px;
+      height: 165px;
+    }
+
+    .bar-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+
+    .bar-pair {
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+    }
+
+    .bar {
+      width: 26px;
+      border-radius: 3px 3px 0 0;
+      position: relative;
+    }
+
+    .bar.fixed { background: var(--accent); }
+    .bar.exp   { background: var(--warn); }
+
+    .bar-label {
+      font-size: 0.42em;
+      color: #71717a;
+      margin-top: 5px;
+    }
+
+    .chart-legend {
+      display: flex;
+      gap: 1.5em;
+      justify-content: center;
+      font-size: 0.58em;
+      margin-top: 0.5em;
+    }
+
+    .legend-dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      margin-right: 5px;
+      vertical-align: middle;
+    }
+
+    /* Summary list */
+    .summary-list {
+      list-style: none;
+      padding: 0;
+      text-align: left;
+      font-size: 0.72em;
+      line-height: 1.6;
+    }
+
+    .summary-list li {
+      padding: 0.45em 0 0.45em 1.8em;
+      position: relative;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .summary-list li:last-child { border-bottom: none; }
+
+    .summary-list li::before {
+      content: attr(data-n);
+      position: absolute;
+      left: 0;
+      color: var(--accent-light);
+      font-weight: 700;
+      font-size: 1.05em;
+    }
+
+    /* Back link */
+    .back-link {
+      position: fixed;
+      top: 14px;
+      left: 14px;
+      z-index: 999;
+      color: rgba(255,255,255,0.35);
+      text-decoration: none;
+      font-size: 0.72rem;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: color 0.15s;
+    }
+
+    .back-link:hover { color: var(--accent-light); }
+
+    /* Mermaid sizing */
+    .reveal .mermaid { margin: 0.2em auto; }
+    .reveal .mermaid svg { max-height: 310px !important; }
+  </style>
+</head>
+<body>
+
+  <a href="/" class="back-link">← Projects</a>
+
+  <div class="reveal">
+    <div class="slides">
+
+      <!-- 1: Title -->
+      <section data-background-gradient="radial-gradient(ellipse at 20% 20%, rgba(99,102,241,0.28), transparent 55%), radial-gradient(ellipse at 80% 80%, rgba(245,158,11,0.15), transparent 55%)">
+        <h1 style="font-size:1.75em; margin-bottom:0.25em;">Dead Letter Queue</h1>
+        <h2 style="color:var(--warn); font-size:1em; margin-bottom:0.5em;">(DLQ) และการจัดการ Retry</h2>
+        <p style="color:#71717a; font-size:0.7em; margin-bottom:1.5em;">ฉบับเข้าใจง่าย</p>
+        <div style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap;">
+          <span class="tag">Message Queue</span>
+          <span class="tag">Distributed Systems</span>
+          <span class="tag">Backend</span>
+        </div>
+      </section>
+
+      <!-- 2: DLQ คืออะไร -->
+      <section>
+        <h2>DLQ คืออะไร?</h2>
+        <div class="box accent" style="margin-bottom:0.7em;">
+          <strong>🏭 เปรียบเหมือนสายพานโรงงาน</strong><br/>
+          ชิ้นงานที่ตรวจแล้วไม่ผ่านซ้ำๆ จะถูกแยกไปไว้ที่ <strong>"ตะกร้าของเสีย"</strong> ต่างหาก<br/>
+          ไม่ปล่อยให้ขวางสายพานหลักจนชิ้นงานอื่นเดินต่อไม่ได้
+        </div>
+        <div class="box" style="font-size:0.8em;">
+          <p><strong style="color:var(--accent-light);">Dead Letter Queue</strong> คือที่พักของ message ที่ประมวลผลไม่สำเร็จซ้ำแล้วซ้ำเล่า</p>
+          <p style="margin-top:0.6em; color:#a1a1aa;">
+            แทนที่จะปล่อยให้ <span style="color:var(--danger);">หายไปเงียบๆ</span>
+            หรือ <span style="color:var(--danger);">วนกลับเข้าคิวหลักไม่รู้จบ</span>
+          </p>
+        </div>
+      </section>
+
+      <!-- 3: ภาพรวม flowchart -->
+      <section>
+        <h2>ภาพรวมการทำงาน</h2>
+        <pre class="mermaid">
+flowchart TD
+    A[Producer ส่ง message] --> B[Main Queue]
+    B --> C[Consumer พยายาม process]
+    C -->|สำเร็จ ✓| D[Ack ปิดงาน]
+    C -->|ล้มเหลว| E[Retry + Backoff]
+    E -->|ยังไม่ครบ max retry| B
+    E -->|เกิน max retry| F[Dead Letter Queue]
+    style D fill:#16a34a,stroke:#16a34a,color:#fff
+    style F fill:#dc2626,stroke:#dc2626,color:#fff
+        </pre>
+      </section>
+
+      <!-- 4: Backoff bar chart -->
+      <section>
+        <h2>ทำไมต้องมี Backoff?</h2>
+        <p style="font-size:0.68em; color:#a1a1aa; margin-bottom:0.3em;">
+          Retry ทันทีถี่ๆ จะยิ่งซ้ำเติมปัญหา — ต้องเพิ่มเวลารอขึ้นเรื่อยๆ
+        </p>
+
+        <div class="chart-wrap">
+          <div class="chart-bars">
+            <!-- Round 1: fixed=2s→12px, exp=1s→12px -->
+            <div class="bar-group">
+              <div class="bar-pair">
+                <div class="bar fixed" style="height:12px"></div>
+                <div class="bar exp"   style="height:12px"></div>
+              </div>
+              <div class="bar-label">รอบ 1</div>
+            </div>
+            <!-- Round 2: fixed=2s→12px, exp=2s→12px -->
+            <div class="bar-group">
+              <div class="bar-pair">
+                <div class="bar fixed" style="height:12px"></div>
+                <div class="bar exp"   style="height:12px"></div>
+              </div>
+              <div class="bar-label">รอบ 2</div>
+            </div>
+            <!-- Round 3: fixed=2s→12px, exp=4s→20px -->
+            <div class="bar-group">
+              <div class="bar-pair">
+                <div class="bar fixed" style="height:12px"></div>
+                <div class="bar exp"   style="height:20px"></div>
+              </div>
+              <div class="bar-label">รอบ 3</div>
+            </div>
+            <!-- Round 4: fixed=2s→12px, exp=8s→40px -->
+            <div class="bar-group">
+              <div class="bar-pair">
+                <div class="bar fixed" style="height:12px"></div>
+                <div class="bar exp"   style="height:40px"></div>
+              </div>
+              <div class="bar-label">รอบ 4</div>
+            </div>
+            <!-- Round 5: fixed=2s→12px, exp=16s→80px -->
+            <div class="bar-group">
+              <div class="bar-pair">
+                <div class="bar fixed" style="height:12px"></div>
+                <div class="bar exp"   style="height:80px"></div>
+              </div>
+              <div class="bar-label">รอบ 5</div>
+            </div>
+            <!-- Round 6: fixed=2s→12px, exp=32s→160px -->
+            <div class="bar-group">
+              <div class="bar-pair">
+                <div class="bar fixed" style="height:12px"></div>
+                <div class="bar exp"   style="height:160px"></div>
+              </div>
+              <div class="bar-label">รอบ 6</div>
+            </div>
+          </div>
+          <div class="chart-legend">
+            <span><span class="legend-dot" style="background:var(--accent);"></span>Fixed delay (2s คงที่)</span>
+            <span><span class="legend-dot" style="background:var(--warn);"></span>Exponential backoff (1→2→4→8→16→32s)</span>
+          </div>
+        </div>
+
+        <div class="box accent" style="margin-top:0.6em; font-size:0.65em;">
+          💡 หากมี client จำนวนมาก retry พร้อมกัน ต้องเพิ่ม
+          <strong style="color:var(--warn);">Jitter</strong> (สุ่มปรับเวลาขึ้น-ลง) เพื่อกระจาย load ไม่ให้ชน spike
+        </div>
+      </section>
+
+      <!-- 5: Permanent vs Transient -->
+      <section>
+        <h2>Permanent vs Transient Error</h2>
+        <div class="col2">
+          <div class="card success">
+            <span class="icon">⚡</span>
+            <strong>Transient Error</strong>
+            <p style="color:#a1a1aa;">Network timeout, downstream โหลดสูงชั่วคราว</p>
+            <p style="margin-top:0.5em; color:#4ade80;">→ รอ backoff แล้ว retry ใหม่</p>
+          </div>
+          <div class="card danger">
+            <span class="icon">🚫</span>
+            <strong style="color:#f87171;">Permanent Error</strong>
+            <p style="color:#a1a1aa;">Data ผิดรูปแบบ, schema ไม่ตรง</p>
+            <p style="margin-top:0.5em; color:#f87171;">→ Fail fast เข้า DLQ ทันที</p>
+          </div>
+        </div>
+        <div class="box warn" style="margin-top:0.8em; font-size:0.68em;">
+          <strong>⚖️ Max Retry Count ต้องสมดุล</strong><br/>
+          <span style="color:#a1a1aa;">น้อยไป</span> → ตัด transient error ก่อนเวลา &nbsp;|&nbsp;
+          <span style="color:#a1a1aa;">มากไป</span> → ตรวจพบ bug ช้า
+        </div>
+      </section>
+
+      <!-- 6: Broker config table -->
+      <section>
+        <h2>ตั้งค่าใน Broker แต่ละตัว</h2>
+        <table class="broker-table">
+          <thead>
+            <tr>
+              <th>Broker</th>
+              <th>วิธีตั้งค่า DLQ</th>
+              <th>วิธี Delay Retry</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="broker-name">RabbitMQ</span></td>
+              <td><code>x-dead-letter-exchange</code> / <code>x-dead-letter-routing-key</code></td>
+              <td>Retry queue ตั้ง TTL แล้ว dead-letter กลับ main queue อัตโนมัติ</td>
+            </tr>
+            <tr>
+              <td><span class="broker-name">AWS SQS</span></td>
+              <td>Redrive Policy + <code>maxReceiveCount</code></td>
+              <td>ควบคุมผ่าน visibility timeout</td>
+            </tr>
+            <tr>
+              <td><span class="broker-name">Kafka</span></td>
+              <td>ไม่มีในตัว — produce ไป topic แยก เช่น <code>orders.DLQ</code></td>
+              <td>เขียน consumer แยกที่ sleep ก่อน produce กลับ</td>
+            </tr>
+            <tr>
+              <td><span class="broker-name">Azure SB</span></td>
+              <td><code>MaxDeliveryCount</code> + <code>DeadLetterAsync()</code></td>
+              <td>ควบคุมผ่าน lock duration</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- 7: หลังจาก DLQ -->
+      <section>
+        <h2>หลังจาก Message เข้า DLQ</h2>
+        <pre class="mermaid" style="font-size:0.82em;">
+flowchart LR
+    A[Message เข้า DLQ] --> B[Monitor / Alert]
+    B --> C[ตรวจสอบ error]
+    C --> D{Transient / Permanent}
+    D -->|Transient| E[รอ downstream เสถียร]
+    D -->|Permanent| F[แก้ bug / data]
+    E --> G[Redrive กลับ Main Queue]
+    F --> G
+    G --> H{ยังมีประโยชน์?}
+    H -->|มี| I[Process ใหม่]
+    H -->|ไม่มี| J[Archive & Delete]
+    style A fill:#dc2626,stroke:#dc2626,color:#fff
+    style I fill:#16a34a,stroke:#16a34a,color:#fff
+        </pre>
+        <div class="col3" style="margin-top:0.4em;">
+          <div class="card">
+            <span class="icon">🔄</span>
+            <strong>Idempotency</strong>
+            เช็ค message ID ก่อน process ป้องกัน side effect ซ้ำ
+          </div>
+          <div class="card">
+            <span class="icon">🤖</span>
+            <strong>Automated Redrive</strong>
+            สำหรับ transient error ที่รู้แน่ว่าจะหายเอง
+          </div>
+          <div class="card">
+            <span class="icon">📊</span>
+            <strong>Dashboard</strong>
+            แยกตาม error type เพื่อเห็น pattern เร็วขึ้น
+          </div>
+        </div>
+      </section>
+
+      <!-- 8: สรุป -->
+      <section data-background-gradient="radial-gradient(ellipse at 20% 30%, rgba(99,102,241,0.2), transparent 60%)">
+        <h2>สรุปสั้นๆ ที่ต้องจำ</h2>
+        <ul class="summary-list">
+          <li data-n="1">DLQ กันไม่ให้ <strong>poison message</strong> ขวางคิวหลัก และกันไม่ให้ message <strong>หายไปเงียบๆ</strong></li>
+          <li data-n="2">Backoff ต้องเพิ่มเวลารอแบบ <strong>exponential</strong> ยิ่งดีถ้ามี <strong>jitter</strong> ด้วย</li>
+          <li data-n="3">Permanent error ควร <strong>fail fast เข้า DLQ ทันที</strong> ไม่ต้อง retry ให้เสียเวลา</li>
+          <li data-n="4">Max retry count ต้องสมดุล — น้อยไปตัด transient, <strong>มากไปตรวจพบ bug ช้า</strong></li>
+          <li data-n="5">Consumer ต้อง <strong>idempotent</strong> เสมอ เพราะ redrive มีโอกาส process ซ้ำ</li>
+        </ul>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({ startOnLoad: false, theme: 'dark' });
+
+    Reveal.initialize({
+      hash: true,
+      width: 960,
+      height: 700,
+      margin: 0.04,
+      controls: true,
+      progress: true,
+      center: true,
+      transition: 'slide',
+    });
+
+    Reveal.on('ready', () => {
+      document.querySelectorAll('.mermaid').forEach(el => mermaid.run({ nodes: [el] }));
+    });
+  </script>
+</body>
+</html>
