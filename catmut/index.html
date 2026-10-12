@@ -1,0 +1,827 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
+<title>CatMut Wallpaper</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Thai:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap">
+<style>
+/* Layout: drafting-table split. A wide neutral stage holds the mat preview and the export bar; a narrow ruled control column sits on the right. */
+:root{
+  --bg:#e9e9e7;
+  --panel:#f4f4f1;
+  --ink:#1b1c1a;
+  --mute:#64675e;
+  --line:#d0d2cb;
+  --field:#ffffff;
+  --accent:#17795c;
+  --accent-ink:#ffffff;
+  --mat-shadow:0 1px 2px rgba(20,24,20,.10),0 22px 44px -14px rgba(20,24,20,.30);
+  --f-ui:"IBM Plex Sans Thai","IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  --f-display:"Newsreader",Georgia,"Times New Roman",serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#131411;--panel:#1b1c19;--ink:#ecece6;--mute:#9b9e93;--line:#32342e;--field:#242521;
+    --accent:#4cc3a0;--accent-ink:#0b1813;
+    --mat-shadow:0 1px 2px rgba(0,0,0,.4),0 22px 44px -14px rgba(0,0,0,.7);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131411;--panel:#1b1c19;--ink:#ecece6;--mute:#9b9e93;--line:#32342e;--field:#242521;
+  --accent:#4cc3a0;--accent-ink:#0b1813;
+  --mat-shadow:0 1px 2px rgba(0,0,0,.4),0 22px 44px -14px rgba(0,0,0,.7);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-ui);font-size:14px;line-height:1.5}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.app{display:grid;grid-template-columns:minmax(0,1fr);min-height:100%}
+.stage{display:flex;flex-direction:column;gap:16px;padding:20px 16px;min-width:0;min-height:0}
+.top{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.top h1{margin:0;font-family:var(--f-display);font-weight:500;font-size:30px;letter-spacing:-.01em;line-height:1}
+.top p{margin:0;color:var(--mute);font-size:13px}
+.canvasWrap{display:grid;place-items:center;min-width:0;min-height:0}
+.mat{width:100%;aspect-ratio:var(--ar,1.6);box-shadow:var(--mat-shadow);background:#fff;overflow:hidden}
+.mat svg{display:block}
+.bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.readout{margin-right:auto;font-family:var(--f-mono);font-size:12px;color:var(--mute);display:flex;gap:14px;flex-wrap:wrap}
+.readout b{font-weight:500;color:var(--ink)}
+.btn{border:1px solid var(--line);background:var(--field);padding:9px 16px;border-radius:4px;cursor:pointer;font-weight:500;font-size:13px}
+.btn:hover{border-color:var(--mute)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover{filter:brightness(1.07)}
+.code{font-size:12px;color:var(--mute)}
+.code summary{cursor:pointer}
+.code textarea{width:100%;height:140px;margin-top:8px;font-family:var(--f-mono);font-size:11px;background:var(--field);border:1px solid var(--line);border-radius:4px;padding:8px;resize:vertical}
+
+.panel{background:var(--panel);border-top:1px solid var(--line);padding:6px 16px 28px;min-width:0}
+.sec{padding:18px 0;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:12px}
+.sec:last-child{border-bottom:0}
+.sec h2{margin:0;font-family:var(--f-mono);font-weight:500;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--mute)}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px;min-width:0}
+.row > span:first-child{color:var(--ink)}
+.row output{font-family:var(--f-mono);font-size:12px;color:var(--mute);min-width:3.2em;text-align:right}
+.ctl{display:flex;align-items:center;gap:8px;min-width:0}
+input[type=range]{accent-color:var(--accent);width:150px;max-width:100%}
+input[type=color]{inline-size:36px;block-size:28px;padding:0;border:1px solid var(--line);border-radius:4px;background:none;cursor:pointer}
+input[type=text],input[type=number],select,textarea{background:var(--field);border:1px solid var(--line);border-radius:4px;padding:6px 8px;min-width:0}
+input[type=text].hex{width:92px;font-family:var(--f-mono);font-size:12px}
+input[type=number]{width:84px;font-family:var(--f-mono);font-size:12px}
+textarea{width:100%;resize:vertical;line-height:1.45}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:4px;overflow:hidden;background:var(--field)}
+.seg button{border:0;background:none;padding:6px 12px;cursor:pointer;font-size:13px;border-right:1px solid var(--line)}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.swatches{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.sw-btn{display:flex;flex-direction:column;align-items:stretch;gap:6px;border:1px solid var(--line);background:var(--field);padding:6px;border-radius:4px;cursor:pointer;font-size:12px}
+.sw-btn i{display:block;block-size:30px;border-radius:2px;border:1px solid rgba(0,0,0,.12)}
+.sw-btn[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:var(--field);border-radius:4px;padding:5px 10px;cursor:pointer;font-family:var(--f-mono);font-size:12px}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.dims{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.dims .x{color:var(--mute)}
+.hint{margin:0;font-size:12px;color:var(--mute)}
+.sw{display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:500}
+.sw input{position:absolute;opacity:0;pointer-events:none}
+.sw .track{inline-size:34px;block-size:20px;border-radius:10px;background:var(--line);position:relative;flex:none;transition:background .15s}
+.sw .track::after{content:"";position:absolute;inset:2px auto 2px 2px;inline-size:16px;border-radius:50%;background:var(--field);box-shadow:0 1px 2px rgba(0,0,0,.3);transition:transform .15s}
+.sw input:checked + .track{background:var(--accent)}
+.sw input:checked + .track::after{transform:translateX(14px)}
+.sw input:focus-visible + .track{outline:2px solid var(--accent);outline-offset:2px}
+.blk{display:flex;flex-direction:column;gap:8px}
+.blk.off .body{opacity:.45;pointer-events:none}
+.body{display:flex;flex-direction:column;gap:8px}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:4px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .2s;max-width:calc(100% - 32px);text-align:center}
+.toast.on{opacity:1}
+
+@media (min-width:900px){
+  html,body{height:100%}
+  .app{height:100%;grid-template-columns:minmax(0,1fr) 392px}
+  .stage{padding:24px 28px}
+  .canvasWrap{flex:1;container-type:size}
+  .mat{width:min(100cqw,calc(100cqh * var(--ar,1.6)))}
+  .panel{border-top:0;border-left:1px solid var(--line);overflow-y:auto;padding:6px 22px 28px}
+}
+@media (prefers-reduced-motion:reduce){.sw .track,.sw .track::after,.toast{transition:none}}
+</style>
+</head>
+<body>
+<div class="app">
+  <main class="stage">
+    <header class="top">
+      <h1>CatMut</h1>
+      <p>สร้างวอลเปเปอร์ลาย cutting mat เป็นไฟล์ SVG</p>
+    </header>
+    <div class="canvasWrap"><div class="mat" id="mat" role="img" aria-label="ตัวอย่างวอลเปเปอร์"></div></div>
+    <div class="bar">
+      <div class="readout"><span id="rdSize"></span><span id="rdRatio"></span></div>
+      <button class="btn" id="copy" type="button">คัดลอกโค้ด SVG</button>
+      <button class="btn" id="dlPng" type="button">ดาวน์โหลด PNG</button>
+      <button class="btn primary" id="dl" type="button">ดาวน์โหลด SVG</button>
+    </div>
+    <details class="code" id="code"><summary>ดูโค้ด SVG</summary><textarea id="codeTa" readonly spellcheck="false"></textarea></details>
+  </main>
+
+  <aside class="panel" aria-label="ตัวเลือก">
+    <section class="sec">
+      <h2>สี</h2>
+      <div class="swatches" id="presets"></div>
+      <div class="row"><span>สีพื้น</span>
+        <div class="ctl"><input type="color" id="bg" aria-label="สีพื้น"><input type="text" class="hex" id="bgHex" maxlength="7" spellcheck="false" aria-label="รหัสสีพื้น"></div></div>
+      <div class="row"><span>สีเส้น</span>
+        <div class="ctl"><input type="color" id="inkC" aria-label="สีเส้น" hidden>
+          <div class="seg" id="segInk"><button type="button" data-v="auto">อัตโนมัติ</button><button type="button" data-v="custom">กำหนดเอง</button></div></div></div>
+      <div class="row"><span>ความเข้มเส้น</span><div class="ctl"><input type="range" id="intensity" min="20" max="160" step="5"><output id="intensityO"></output></div></div>
+    </section>
+
+    <section class="sec">
+      <h2>ขนาดและอัตราส่วน</h2>
+      <div class="chips" id="ratios"></div>
+      <div class="dims">
+        <input type="number" id="cw" min="200" max="12000" step="1" aria-label="ความกว้าง px"><span class="x">×</span>
+        <input type="number" id="ch" min="200" max="12000" step="1" aria-label="ความสูง px"><span class="x">px</span>
+        <button class="btn" id="swap" type="button" style="padding:6px 12px">สลับแนวตั้ง/นอน</button>
+      </div>
+      <p class="hint" id="ratioHint"></p>
+    </section>
+
+    <section class="sec">
+      <h2>ลวดลาย</h2>
+      <div class="row"><span>รูปแบบ</span>
+        <div class="seg" id="segPattern"><button type="button" data-v="grid">เส้นกริด</button><button type="button" data-v="cross">กากบาท</button></div></div>
+      <div class="row"><span>ขนาดช่อง</span><div class="ctl"><input type="range" id="cell" min="60" max="160" step="5"><output id="cellO"></output></div></div>
+      <label class="sw"><input type="checkbox" id="angles"><span class="track"></span><span>เส้นมุม 15° – 75°</span></label>
+      <label class="sw"><input type="checkbox" id="ruler"><span class="track"></span><span>ขีดและตัวเลขไม้บรรทัดรอบขอบ</span></label>
+    </section>
+
+    <section class="sec">
+      <h2>เงา</h2>
+      <label class="sw"><input type="checkbox" id="shadowOn"><span class="track"></span><span>ใส่เงาทาบ</span></label>
+      <div id="shadowBody" class="body">
+        <div class="chips" id="shadowStyles" role="group" aria-label="รูปแบบเงา"></div>
+        <div class="row"><span>ความเข้ม</span><div class="ctl"><input type="range" id="shadowAmt" min="10" max="100" step="5"><output id="shadowO"></output></div></div>
+        <div><button class="btn" id="reseed" type="button" style="padding:6px 12px">สุ่มรูปทรงเงาใหม่</button></div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <h2>ข้อความ</h2>
+      <div class="blk" id="quoteBlk">
+        <label class="sw"><input type="checkbox" id="quoteOn"><span class="track"></span><span>Quote กลางภาพ</span></label>
+        <div class="body">
+          <textarea id="quote" rows="2" aria-label="ข้อความ Quote" placeholder="พิมพ์ข้อความ (ขึ้นบรรทัดใหม่ได้)"></textarea>
+          <div class="row"><span>ฟอนต์</span>
+            <select id="quoteFont" aria-label="ฟอนต์ Quote"></select></div>
+          <div class="row"><span>ขนาดตัวอักษร</span><div class="ctl"><input type="range" id="quoteSize" min="50" max="180" step="5"><output id="quoteSizeO"></output></div></div>
+        </div>
+      </div>
+      <div class="blk" id="bodyBlk">
+        <label class="sw"><input type="checkbox" id="bodyOn"><span class="track"></span><span>ย่อหน้ามุมขวาล่าง</span></label>
+        <div class="body">
+          <textarea id="body" rows="4" aria-label="ข้อความย่อหน้า" placeholder="ข้อความย่อหน้า"></textarea>
+          <div class="row"><span>ฟอนต์</span><select id="bodyFont" aria-label="ฟอนต์ย่อหน้า"></select></div>
+          <div class="row"><span>ความกว้างกล่อง (ช่อง)</span><div class="ctl"><input type="range" id="bodyCols" min="2" max="6" step="1"><output id="bodyColsO"></output></div></div>
+        </div>
+      </div>
+      <div class="blk" id="labelBlk">
+        <label class="sw"><input type="checkbox" id="labelOn"><span class="track"></span><span>ป้ายแนวตั้งมุมซ้ายบน</span></label>
+        <div class="body">
+          <textarea id="label" rows="2" aria-label="ข้อความป้ายแนวตั้ง"></textarea>
+          <div class="row"><span>ฟอนต์</span><select id="labelFont" aria-label="ฟอนต์ป้าย"></select></div>
+          <p class="hint">ใช้ {ratio} {year} {size} แทนค่าอัตโนมัติได้</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <h2>ฟอนต์เพิ่มเติม</h2>
+      <div class="blk"><span>จาก Google Fonts</span>
+        <div class="ctl"><input type="text" id="gfName" placeholder="เช่น Playfair Display" style="flex:1" spellcheck="false"><button class="btn" id="gfAdd" type="button" style="padding:6px 12px">เพิ่ม</button></div>
+        <p class="hint">พิมพ์ชื่อตามที่เห็นบน fonts.google.com ในไฟล์ SVG จะใส่ลิงก์ฟอนต์ให้ เปิดในเบราว์เซอร์ตอนออนไลน์จะเห็นฟอนต์นี้ แต่โปรแกรมออกแบบบางตัวไม่โหลดให้</p></div>
+      <div class="blk"><span>อัปโหลดไฟล์ฟอนต์</span>
+        <input type="file" id="fontFile" accept=".ttf,.otf,.woff,.woff2">
+        <p class="hint">ฝังฟอนต์ไว้ในไฟล์ SVG และ PNG ให้เลย เปิดที่ไหนก็เห็นเหมือนกัน (ไม่เกิน 6 MB)</p></div>
+    </section>
+  </aside>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/*GEN-START*/
+const FONT_EMBED = {}, FONT_GF = {};
+const FONTS = {
+  serif: "Georgia, 'Times New Roman', serif",
+  sans: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+  mono: "'IBM Plex Mono', 'SF Mono', Menlo, Consolas, monospace"
+};
+let _mctx = null;
+function tw(text, size, fam) {
+  if (!_mctx) _mctx = document.createElement('canvas').getContext('2d');
+  _mctx.font = '400 ' + size + 'px ' + fam;
+  return _mctx.measureText(text).width;
+}
+const f = n => +(+n).toFixed(2);
+const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+function lum(hex) {
+  const n = parseInt(hex.slice(1), 16);
+  return (0.2126 * ((n >> 16) & 255) + 0.7152 * ((n >> 8) & 255) + 0.0722 * (n & 255)) / 255;
+}
+function mulberry32(a) {
+  return function () {
+    a |= 0; a = (a + 0x6D2B79F5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+const KNOWN = [[16, 10], [16, 9], [21, 9], [3, 2], [4, 3], [1, 1], [19.5, 9]];
+function knownRatio(W, H) {
+  const r = Math.max(W, H) / Math.min(W, H);
+  for (const [a, b] of KNOWN) if (Math.abs(r - a / b) < 0.012) return [a, b];
+  return null;
+}
+function ratioLabel(W, H) {
+  const k = knownRatio(W, H);
+  if (!k) return W + ' X ' + H + ' PX';
+  return W >= H ? k[0] + ' X ' + k[1] : k[1] + ' X ' + k[0];
+}
+function wrapText(text, fs, fam, maxW) {
+  const out = [];
+  const seg = (typeof Intl !== 'undefined' && Intl.Segmenter) ? new Intl.Segmenter(undefined, { granularity: 'word' }) : null;
+  String(text).split('\n').forEach(par => {
+    const toks = seg ? Array.from(seg.segment(par), x => x.segment) : par.split(/(\s+)/);
+    let line = '';
+    toks.forEach(tok => {
+      const test = line + tok;
+      if (!line.trim() || tw(test.trimEnd(), fs, fam) <= maxW) line = test;
+      else { out.push(line.trimEnd()); line = tok.trimStart(); }
+    });
+    out.push(line.trimEnd());
+  });
+  return out;
+}
+function leavesSVG(W, H, seed, amt) {
+  const rnd = mulberry32(seed * 7 + 3), b = Math.min(W, H), diag = Math.hypot(W, H), rad = Math.PI / 180;
+  const leaf = (x, y, a, L, w) => {
+    const dx = Math.cos(a), dy = Math.sin(a), px = -dy, py = dx;
+    const P = (u, v) => f(x + dx * v + px * u) + ' ' + f(y + dy * v + py * u);
+    return 'M' + P(0, 0) + 'C' + P(w, L * 0.25) + ' ' + P(w * 0.7, L * 0.75) + ' ' + P(0, L) +
+      'C' + P(-w * 0.7, L * 0.75) + ' ' + P(-w, L * 0.25) + ' ' + P(0, 0) + 'Z';
+  };
+  const branch = Lmax => {
+    const left = rnd() < 0.7;
+    const ox = (left ? -0.08 + rnd() * 0.5 : 1.08 - rnd() * 0.5) * W, oy = (-0.08 + rnd() * 0.15) * H;
+    let ang = 32 + rnd() * 40; if (!left) ang = 180 - ang; ang *= rad;
+    const len = diag * (0.65 + rnd() * 0.35), curv = (rnd() - 0.5) * len * 0.4;
+    const dx = Math.cos(ang), dy = Math.sin(ang), nx = -dy, ny = dx;
+    const P0 = [ox, oy], P1 = [ox + dx * len * 0.5 + nx * curv, oy + dy * len * 0.5 + ny * curv], P2 = [ox + dx * len, oy + dy * len];
+    const pt = t => [0, 1].map(k => (1 - t) * (1 - t) * P0[k] + 2 * (1 - t) * t * P1[k] + t * t * P2[k]);
+    const tan = t => Math.atan2(2 * (1 - t) * (P1[1] - P0[1]) + 2 * t * (P2[1] - P1[1]), 2 * (1 - t) * (P1[0] - P0[0]) + 2 * t * (P2[0] - P1[0]));
+    const stem = 'M' + f(P0[0]) + ' ' + f(P0[1]) + 'Q' + f(P1[0]) + ' ' + f(P1[1]) + ' ' + f(P2[0]) + ' ' + f(P2[1]);
+    let d = '';
+    const n = 16 + Math.floor(rnd() * 6);
+    for (let i = 1; i <= n; i++) {
+      const t = i / n * 0.95, p = pt(t), a = tan(t);
+      [1, -1].forEach(side => {
+        const la = a + side * (48 + rnd() * 24) * rad + (rnd() - 0.5) * 0.2;
+        const L = Lmax * (1 - 0.6 * t) * (0.75 + rnd() * 0.5);
+        d += leaf(p[0], p[1], la, L, L * (0.2 + rnd() * 0.1));
+      });
+    }
+    const pe = pt(0.97);
+    d += leaf(pe[0], pe[1], tan(0.97), Lmax * 0.3, Lmax * 0.08);
+    return { d, stem };
+  };
+  const layer = (count, Lmax, stemW) => {
+    let st = '', lv = '';
+    for (let i = 0; i < count; i++) { const r = branch(Lmax); st += r.stem; lv += r.d; }
+    return '<path d="' + st + '" fill="none" stroke="#000" stroke-width="' + f(stemW) + '" stroke-linecap="round"/><path d="' + lv + '" fill="#000"/>';
+  };
+  const far = layer(2, 0.24 * b, 0.008 * b), near = layer(3, 0.13 * b, 0.004 * b);
+  const sdA = b * 0.016, sdB = b * 0.005;
+  const flt = (id, sd) => '<filter id="' + id + '" filterUnits="userSpaceOnUse" x="' + f(-sd * 3) + '" y="' + f(-sd * 3) + '" width="' + f(W + sd * 6) + '" height="' + f(H + sd * 6) + '"><feGaussianBlur stdDeviation="' + f(sd) + '"/></filter>';
+  const defs = flt('cmBlurA', sdA) + flt('cmBlurB', sdB) +
+    '<linearGradient id="cmFadeG" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="' + W + '" y2="' + H + '"><stop offset="0" stop-color="#fff"/><stop offset="0.5" stop-color="#bdbdbd"/><stop offset="1" stop-color="#2a2a2a"/></linearGradient>' +
+    '<mask id="cmFade" maskUnits="userSpaceOnUse" x="0" y="0" width="' + W + '" height="' + H + '"><rect width="' + W + '" height="' + H + '" fill="url(#cmFadeG)"/></mask>';
+  return '<defs>' + defs + '</defs><g mask="url(#cmFade)">' +
+    '<g filter="url(#cmBlurA)" opacity="' + f(amt / 100 * 0.62) + '">' + far + '</g>' +
+    '<g filter="url(#cmBlurB)" opacity="' + f(amt / 100 * 0.5) + '">' + near + '</g></g>';
+}
+function shadowSVG(W, H, seed, amt, style) {
+  if (style === 'leaves') return leavesSVG(W, H, seed, amt);
+  const rnd = mulberry32(seed), b = Math.min(W, H), diag = Math.hypot(W, H);
+  let shapes = '', sd = W * 0.011, fade = true, defs = '', center = f(W / 2) + ' ' + f(H / 2);
+  if (style === 'blinds') {
+    const sp = H * (0.06 + rnd() * 0.04), th = sp * 0.5, ang = -(4 + rnd() * 14);
+    sd = sp * 0.1;
+    let g = '';
+    for (let y = -diag; y < diag * 2; y += sp) g += '<rect x="' + f(-diag) + '" y="' + f(y) + '" width="' + f(diag * 3) + '" height="' + f(th) + '"/>';
+    // ladder cords run across the slats
+    const cw = sp * (0.07 + rnd() * 0.03), cs = W * (0.26 + rnd() * 0.14);
+    for (let x = -rnd() * cs; x < W * 1.25; x += cs) g += '<rect x="' + f(x - cw / 2) + '" y="' + f(-diag) + '" width="' + f(cw) + '" height="' + f(diag * 3) + '"/>';
+    shapes = '<g transform="rotate(' + f(ang) + ' ' + center + ')" fill="#000" opacity="0.6">' + g + '</g>';
+  } else if (style === 'window') {
+    const cols = 2 + Math.floor(rnd() * 2), rows = 2 + Math.floor(rnd() * 2);
+    const gap = b * 0.03, pw = W * (0.7 + rnd() * 0.15), ph = H * 0.85;
+    const cw = (pw - gap * (cols - 1)) / cols, rh = (ph - gap * (rows - 1)) / rows;
+    const x0 = W * (0.08 + rnd() * 0.12), y0 = -H * 0.05, skew = -(14 + rnd() * 14);
+    let d = 'M' + f(-3 * W) + ' ' + f(-3 * H) + 'H' + f(3 * W) + 'V' + f(3 * H) + 'H' + f(-3 * W) + 'Z';
+    for (let c = 0; c < cols; c++) for (let r = 0; r < rows; r++) {
+      const x = x0 + c * (cw + gap), y = y0 + r * (rh + gap);
+      d += 'M' + f(x) + ' ' + f(y) + 'h' + f(cw) + 'v' + f(rh) + 'h' + f(-cw) + 'Z';
+    }
+    sd = b * 0.006; fade = false;
+    shapes = '<g transform="translate(0 ' + f(H * 0.02) + ') skewX(' + f(skew) + ')" fill="#000"><path d="' + d + '" fill-rule="evenodd" fill-opacity="0.62"/></g>';
+  } else if (style === 'leaves') {
+    sd = b * 0.012;
+    let g = '';
+    for (let i = 0; i < 30; i++) {
+      const cx = Math.pow(rnd(), 1.5) * W * 1.1, cy = Math.pow(rnd(), 1.5) * H * 1.1;
+      const rx = (0.05 + rnd() * 0.12) * b, ry = rx * (0.22 + rnd() * 0.2);
+      const rot = -70 + rnd() * 50, o = 0.35 + rnd() * 0.45;
+      g += '<ellipse cx="' + f(cx) + '" cy="' + f(cy) + '" rx="' + f(rx) + '" ry="' + f(ry) + '" transform="rotate(' + f(rot) + ' ' + f(cx) + ' ' + f(cy) + ')" fill-opacity="' + f(o) + '"/>';
+    }
+    shapes = '<g fill="#000">' + g + '</g>';
+  } else if (style === 'gradient') {
+    const a = rnd() * 0.3;
+    return '<defs><linearGradient id="cmShG" gradientUnits="userSpaceOnUse" x1="' + f(W * a) + '" y1="0" x2="' + f(W * (1 - a * 0.5)) + '" y2="' + H + '"><stop offset="0" stop-color="#000" stop-opacity="0.8"/><stop offset="0.5" stop-color="#000" stop-opacity="0.3"/><stop offset="1" stop-color="#000" stop-opacity="0"/></linearGradient></defs>' +
+      '<rect width="' + W + '" height="' + H + '" fill="url(#cmShG)" opacity="' + f(amt / 100) + '"/>';
+  } else {
+    const n = 11, step = 2.2 * W / n;
+    let g = '';
+    for (let i = 0; i < n; i++) {
+      const w = (0.025 + rnd() * 0.075) * W;
+      const cx = -0.6 * W + i * step + rnd() * step * 0.6;
+      const o = 0.38 + rnd() * 0.42;
+      g += '<rect x="' + f(cx - w / 2) + '" y="' + f(-diag) + '" width="' + f(w) + '" height="' + f(diag * 3) + '" fill-opacity="' + f(o) + '"/>';
+    }
+    shapes = '<g transform="rotate(-24 ' + center + ')" fill="#000">' + g + '</g>';
+  }
+  const pad = sd * 3;
+  defs = '<filter id="cmBlur" filterUnits="userSpaceOnUse" x="' + f(-pad) + '" y="' + f(-pad) + '" width="' + f(W + pad * 2) + '" height="' + f(H + pad * 2) + '"><feGaussianBlur stdDeviation="' + f(sd) + '"/></filter>';
+  if (fade) defs += '<linearGradient id="cmFadeG" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="' + W + '" y2="' + H + '"><stop offset="0" stop-color="#fff"/><stop offset="0.5" stop-color="#bdbdbd"/><stop offset="1" stop-color="#2a2a2a"/></linearGradient>' +
+    '<mask id="cmFade" maskUnits="userSpaceOnUse" x="0" y="0" width="' + W + '" height="' + H + '"><rect width="' + W + '" height="' + H + '" fill="url(#cmFadeG)"/></mask>';
+  const inner = '<g filter="url(#cmBlur)" opacity="' + f(amt / 100) + '">' + shapes + '</g>';
+  return '<defs>' + defs + '</defs>' + (fade ? '<g mask="url(#cmFade)">' + inner + '</g>' : inner);
+}
+
+function build(S, opts) {
+  const W = S.cw, H = S.ch, b = Math.min(W, H), t = b / 1600;
+  const mx = 0.045 * b, tp = 0.06 * b, bt = 0.097 * b;
+  const x0 = mx, y0 = tp, x1 = W - mx, y1 = H - bt, fw = x1 - x0, fh = y1 - y0;
+  let cell = 0.153 * b * S.cell;
+  cell = Math.min(cell, fw / 3, fh / 3);
+  const strip = 0.4 * cell, ox = x0 + strip, oy = y1 - strip, sub = 5, m = cell / sub;
+  const bg = S.bg;
+  const ink = S.ink === 'auto' ? (lum(bg) > 0.6 ? '#2b2926' : '#ffffff') : S.inkCustom;
+  const k = S.intensity / 100;
+  const op = v => f(Math.min(1, v * k));
+  const grid = S.pattern === 'grid';
+  const eps = 0.5;
+  const i0 = -Math.floor(strip / m + 1e-6);
+
+  let minor = '', major = '', cross = '', crossBig = '';
+  if (grid) {
+    for (let i = i0; ox + i * m < x1 - eps; i++) {
+      const x = ox + i * m;
+      if (x <= x0 + eps || i % 5 === 0) continue;
+      minor += 'M' + f(x) + ' ' + f(y0) + 'V' + f(y1);
+    }
+    for (let i = i0; oy - i * m > y0 + eps; i++) {
+      const y = oy - i * m;
+      if (y >= y1 - eps || i % 5 === 0) continue;
+      minor += 'M' + f(x0) + ' ' + f(y) + 'H' + f(x1);
+    }
+    for (let i = 0; ox + i * cell < x1 - eps; i++) major += 'M' + f(ox + i * cell) + ' ' + f(y0) + 'V' + f(y1);
+    for (let i = 0; oy - i * cell > y0 + eps; i++) major += 'M' + f(x0) + ' ' + f(oy - i * cell) + 'H' + f(x1);
+  } else {
+    const a = m * 0.14, A = m * 0.3;
+    for (let i = i0; ox + i * m < x1 - eps; i++) {
+      const x = ox + i * m;
+      if (x <= x0 + eps) continue;
+      for (let j = i0; oy - j * m > y0 + eps; j++) {
+        const y = oy - j * m;
+        if (y >= y1 - eps) continue;
+        if (i % 5 === 0 && j % 5 === 0) crossBig += 'M' + f(x - A) + ' ' + f(y) + 'h' + f(2 * A) + 'M' + f(x) + ' ' + f(y - A) + 'v' + f(2 * A);
+        else cross += 'M' + f(x - a) + ' ' + f(y) + 'h' + f(2 * a) + 'M' + f(x) + ' ' + f(y - a) + 'v' + f(2 * a);
+      }
+    }
+  }
+
+  // angle lines from the bottom-left corner of the mat
+  let dashed = '', solid = '', angLabels = '';
+  if (S.angles) {
+    const end = th => {
+      const r = th * Math.PI / 180, c = Math.cos(r), s = Math.sin(r);
+      const tt = Math.min(fw / c, fh / s);
+      return [x0 + c * tt, y1 - s * tt];
+    };
+    [15, 30, 60, 75].forEach(d => { const e = end(d); dashed += 'M' + f(x0) + ' ' + f(y1) + 'L' + f(e[0]) + ' ' + f(e[1]); });
+    const e45 = end(45); solid = 'M' + f(x0) + ' ' + f(y1) + 'L' + f(e45[0]) + ' ' + f(e45[1]);
+    const lf = Math.max(6, 0.045 * cell), dist = 1.1 * cell;
+    [15, 30, 45, 60, 75].forEach(d => {
+      const r = d * Math.PI / 180;
+      angLabels += '<text x="' + f(x0 + Math.cos(r) * dist + 3 * t) + '" y="' + f(y1 - Math.sin(r) * dist + lf * 0.35) + '">' + d + '°</text>';
+    });
+    angLabels = '<g font-family="' + FONTS.sans + '" font-size="' + f(lf) + '" fill="' + ink + '" fill-opacity="' + op(0.5) + '">' + angLabels + '</g>';
+  }
+
+  // ruler ticks and numbers outside the frame
+  let ticks = '', nums = '';
+  if (S.ruler) {
+    const gap = 16 * t, lmin = 5 * t, lmaj = 11 * t, fsz = 8.5 * t, pad = 4 * t;
+    for (let i = i0; ox + i * m <= x1 + eps; i++) {
+      const x = ox + i * m;
+      if (x < x0 - eps) continue;
+      const mj = i % 5 === 0;
+      ticks += 'M' + f(x) + ' ' + f(y0 - gap) + 'v' + f(-(mj ? lmaj : lmin));
+      if (mj && i >= 0) nums += '<text x="' + f(x) + '" y="' + f(y0 - gap - lmaj - pad) + '" text-anchor="middle">' + (i / 5) + '</text>';
+    }
+    for (let i = i0; oy - i * m >= y0 - eps; i++) {
+      const y = oy - i * m;
+      if (y > y1 + eps) continue;
+      const mj = i % 5 === 0, len = mj ? lmaj : lmin;
+      ticks += 'M' + f(x0 - gap) + ' ' + f(y) + 'h' + f(-len) + 'M' + f(x1 + gap) + ' ' + f(y) + 'h' + f(len);
+      if (mj && i >= 0) {
+        nums += '<text x="' + f(x0 - gap - lmaj - pad) + '" y="' + f(y + fsz * 0.35) + '" text-anchor="end">' + (i / 5) + '</text>';
+        nums += '<text x="' + f(x1 + gap + lmaj + pad) + '" y="' + f(y + fsz * 0.35) + '" text-anchor="start">' + (i / 5) + '</text>';
+      }
+    }
+    nums = '<g font-family="' + FONTS.mono + '" font-size="' + f(fsz) + '" fill="' + ink + '" fill-opacity="' + op(0.55) + '">' + nums + '</g>';
+  }
+
+  // text boxes (mask the grid) and text
+  let masks = '', texts = '';
+  const cxF = (x0 + x1) / 2, cyF = (y0 + y1) / 2;
+
+  if (S.quoteOn && S.quote.trim()) {
+    const lines = S.quote.split('\n').map(l => l.trim()).filter(Boolean).slice(0, 4);
+    const fam = FONTS[S.quoteFont] || FONTS.sans;
+    const fs = cell * 0.24 * S.quoteSize;
+    const maxW = Math.max.apply(null, lines.map(l => tw(l, fs, fam)));
+    const lh = fs * 1.02, textH = lh * lines.length;
+    const n = Math.max(2, Math.ceil((maxW + cell * 0.7) / cell));
+    const r = Math.max(1, Math.ceil((textH + cell * 0.5) / cell));
+    const kx = Math.round((cxF - ox) / cell - n / 2);
+    const ky = Math.round((oy - cyF) / cell - r / 2);
+    const bx = ox + kx * cell, bw = n * cell, by = oy - (ky + r) * cell, bh = r * cell;
+    masks += '<rect x="' + f(bx) + '" y="' + f(by) + '" width="' + f(bw) + '" height="' + f(bh) + '"/>';
+    const cx = bx + bw / 2, cy = by + bh / 2;
+    let tsp = '';
+    lines.forEach((l, i) => {
+      tsp += '<tspan x="' + f(cx) + '" y="' + f(cy - textH / 2 + lh * (i + 0.5) + fs * 0.33) + '">' + esc(l) + '</tspan>';
+    });
+    texts += '<text font-family="' + fam + '" font-size="' + f(fs) + '" text-anchor="middle" letter-spacing="' + f(-fs * 0.01) + '" fill="' + ink + '" fill-opacity="' + op(0.95) + '">' + tsp + '</text>';
+  }
+
+  if (S.bodyOn && S.body.trim()) {
+    const fam = FONTS[S.bodyFont] || FONTS.sans, fs = cell * 0.095, lh = fs * 1.38;
+    const left = ox + Math.max(0, Math.floor((x1 - ox - S.bodyCols * cell) / cell)) * cell;
+    const maxW = Math.max(cell * 0.8, x1 - left - cell * 0.7);
+    const lines = wrapText(S.body, fs, fam, maxW);
+    const textH = lines.length * lh;
+    const r = Math.max(1, Math.ceil((textH + cell * 0.7 - strip) / cell));
+    const by = oy - r * cell;
+    masks += '<rect x="' + f(left) + '" y="' + f(by) + '" width="' + f(x1 - left) + '" height="' + f(y1 - by) + '"/>';
+    const top = by + (y1 - by - textH) / 2;
+    let tsp = '';
+    lines.forEach((l, i) => {
+      tsp += '<tspan x="' + f(left + cell * 0.35) + '" y="' + f(top + lh * (i + 0.5) + fs * 0.33) + '">' + esc(l) + '</tspan>';
+    });
+    texts += '<text font-family="' + fam + '" font-size="' + f(fs) + '" fill="' + ink + '" fill-opacity="' + op(0.85) + '">' + tsp + '</text>';
+  }
+
+  if (S.labelOn && S.label.trim()) {
+    const raw = S.label.replace(/\{ratio\}/g, ratioLabel(W, H)).replace(/\{year\}/g, String(new Date().getFullYear())).replace(/\{size\}/g, W + '×' + H);
+    const lines = raw.split('\n').map(l => l.trim()).filter(Boolean).slice(0, 3);
+    const fs = Math.max(7, cell * 0.058), lh = fs * 1.4;
+    const fam = FONTS[S.labelFont] || FONTS.sans;
+    const len = Math.max.apply(null, lines.map(l => tw(l.toUpperCase(), fs, fam) * 1.07));
+    masks += '<rect x="' + f(x0) + '" y="' + f(y0) + '" width="' + f(strip) + '" height="' + f(Math.min(fh, len + cell * 0.45)) + '"/>';
+    const bx = x0 + strip * 0.5 + (lines.length - 1) * lh * 0.5, by = y0 + cell * 0.22;
+    let tsp = '';
+    lines.forEach((l, i) => { tsp += '<tspan x="0" y="' + f(i * lh) + '">' + esc(l.toUpperCase()) + '</tspan>'; });
+    texts += '<g transform="translate(' + f(bx) + ' ' + f(by) + ') rotate(90)"><text font-family="' + fam + '" font-size="' + f(fs) + '" letter-spacing="' + f(fs * 0.07) + '" fill="' + ink + '" fill-opacity="' + op(0.85) + '">' + tsp + '</text></g>';
+  }
+
+  const q = Math.max(1, t);
+  let svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '">';
+  if (opts && opts.embed) {
+    const used = [S.quoteOn && S.quote.trim() ? S.quoteFont : null, S.bodyOn && S.body.trim() ? S.bodyFont : null, S.labelOn && S.label.trim() ? S.labelFont : null].filter(Boolean);
+    const uniq = Array.from(new Set(used));
+    let css = '';
+    if (opts.imports) uniq.forEach(id => { if (FONT_GF[id]) css += '@import url(' + FONT_GF[id] + ');'; });
+    uniq.forEach(id => { if (FONT_EMBED[id]) css += FONT_EMBED[id]; });
+    if (css) svg += '<defs><style><![CDATA[' + css + ']]></style></defs>';
+  }
+  svg += '<rect width="' + W + '" height="' + H + '" fill="' + bg + '"/>';
+  svg += '<g fill="none" stroke="' + ink + '">';
+  if (minor) svg += '<path d="' + minor + '" stroke-width="' + f(1 * q) + '" stroke-opacity="' + op(0.16) + '"/>';
+  if (major) svg += '<path d="' + major + '" stroke-width="' + f(2.2 * q) + '" stroke-opacity="' + op(0.62) + '"/>';
+  if (cross) svg += '<path d="' + cross + '" stroke-width="' + f(1 * q) + '" stroke-opacity="' + op(0.42) + '"/>';
+  if (crossBig) svg += '<path d="' + crossBig + '" stroke-width="' + f(1.4 * q) + '" stroke-opacity="' + op(0.6) + '"/>';
+  if (dashed) svg += '<path d="' + dashed + '" stroke-width="' + f(1 * q) + '" stroke-opacity="' + op(0.38) + '" stroke-dasharray="' + f(6 * t) + ' ' + f(5 * t) + '"/>';
+  if (solid) svg += '<path d="' + solid + '" stroke-width="' + f(1.6 * q) + '" stroke-opacity="' + op(0.85) + '"/>';
+  svg += '</g>';
+  if (masks) svg += '<g fill="' + bg + '">' + masks + '</g>';
+  if (grid) svg += '<rect x="' + f(x0) + '" y="' + f(y0) + '" width="' + f(fw) + '" height="' + f(fh) + '" fill="none" stroke="' + ink + '" stroke-opacity="' + op(0.8) + '" stroke-width="' + f(2.4 * q) + '"/>';
+  if (ticks) svg += '<path d="' + ticks + '" fill="none" stroke="' + ink + '" stroke-opacity="' + op(0.5) + '" stroke-width="' + f(1 * q) + '"/>';
+  svg += nums + angLabels + texts;
+  if (S.shadow) svg += shadowSVG(W, H, S.seed, S.shadowAmt, S.shadowStyle);
+  svg += '</svg>';
+  return svg;
+}
+/*GEN-END*/
+
+/* ---------- UI ---------- */
+const $ = id => document.getElementById(id);
+const S = {
+  bg: '#1c9272', ink: 'auto', inkCustom: '#ffffff', intensity: 100, pattern: 'grid',
+  cw: 2560, ch: 1600, cell: 1, angles: true, ruler: true,
+  shadow: true, shadowAmt: 70, seed: 7, shadowStyle: 'stripes',
+  quoteOn: true, quote: 'Stay Focused.', quoteSize: 1, quoteFont: 'Newsreader', bodyFont: 'sans', labelFont: 'sans',
+  bodyOn: true, body: "Don't let distractions dilute your potential. Instead, direct your attention toward what truly matters, silence the noise that surrounds you, pursue your priorities with intention, and watch clarity transform into extraordinary results.", bodyCols: 3,
+  labelOn: true, label: 'CUTTING MAT WALLPAPER PACK\n{ratio} ASPECT RATIO - {year}'
+};
+const PRESETS = [
+  { n: 'กระดาษ', bg: '#f7f5f2', int: 100 },
+  { n: 'เขียว', bg: '#1c9272', int: 100 },
+  { n: 'ส้ม', bg: '#d55f1e', int: 100 },
+  { n: 'ดำ', bg: '#0b0b0b', int: 45 }
+];
+const RATIOS = [['16:10', 16, 10], ['16:9', 16, 9], ['21:9', 21, 9], ['3:2', 3, 2], ['4:3', 4, 3], ['1:1', 1, 1], ['19.5:9', 19.5, 9]];
+const EXP = { embed: true, imports: true };
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+/* ---------- fonts ---------- */
+const GENERIC = {
+  serif: "Georgia, 'Times New Roman', serif", sans: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+  mono: "Menlo, Consolas, monospace", thai: "Tahoma, sans-serif", hand: "'Comic Sans MS', cursive"
+};
+const GF_GROUPS = [
+  ['Serif', 'serif', ['Newsreader', 'Playfair Display', 'Cormorant Garamond', 'DM Serif Display', 'Libre Baskerville', 'Lora', 'Fraunces', 'Source Serif 4', 'Instrument Serif']],
+  ['Sans', 'sans', ['Inter', 'DM Sans', 'Work Sans', 'Manrope', 'Space Grotesk', 'Poppins', 'Montserrat', 'Archivo', 'Bebas Neue']],
+  ['ภาษาไทย', 'thai', ['IBM Plex Sans Thai', 'Noto Sans Thai', 'Noto Serif Thai', 'Sarabun', 'Prompt', 'Kanit', 'Mitr', 'Pridi', 'Krub', 'Mali']],
+  ['Mono', 'mono', ['IBM Plex Mono', 'JetBrains Mono', 'Space Mono']],
+  ['ลายมือ / โชว์', 'hand', ['Caveat', 'Pacifico', 'Abril Fatface']]
+];
+const gfUrl = n => 'https://fonts.googleapis.com/css2?family=' + encodeURIComponent(n).replace(/%20/g, '+') + '&display=swap';
+GF_GROUPS.forEach(([, gen, names]) => names.forEach(n => { FONTS[n] = "'" + n + "', " + GENERIC[gen]; FONT_GF[n] = gfUrl(n); }));
+const gfLoaded = new Set(['Newsreader', 'IBM Plex Mono', 'IBM Plex Sans Thai']);
+const customAdded = [];
+const sampleText = () => (S.quote + S.body + S.label).slice(0, 400);
+function loadSheet(href) {
+  return new Promise(res => {
+    const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = href;
+    const t = setTimeout(() => res(false), 8000);
+    l.onload = () => { clearTimeout(t); res(true); };
+    l.onerror = () => { clearTimeout(t); res(false); };
+    document.head.appendChild(l);
+  });
+}
+async function ensureFont(id) {
+  if (!FONT_GF[id] || gfLoaded.has(id)) return;
+  await loadSheet(FONT_GF[id]);
+  gfLoaded.add(id);
+  try { await document.fonts.load('400 24px ' + FONTS[id], sampleText()); } catch (e) { /* ignore */ }
+}
+function fillFontSelects() {
+  ['quoteFont', 'bodyFont', 'labelFont'].forEach(k => {
+    const sel = $(k); sel.innerHTML = '';
+    const add = (label, items) => {
+      const g = document.createElement('optgroup'); g.label = label;
+      items.forEach(([v, t]) => { const o = document.createElement('option'); o.value = v; o.textContent = t; g.appendChild(o); });
+      sel.appendChild(g);
+    };
+    add('ระบบ', [['sans', 'Helvetica / Arial'], ['serif', 'Georgia'], ['mono', 'Mono']]);
+    GF_GROUPS.forEach(([lab, , names]) => add(lab, names.map(n => [n, n])));
+    if (customAdded.length) add('เพิ่มเอง', customAdded.map(c => [c.id, c.label]));
+    sel.value = S[k];
+  });
+}
+function useNewFont(id, label) {
+  customAdded.push({ id, label });
+  S.quoteFont = id; fillFontSelects(); render();
+  toast('ตั้ง "' + label + '" เป็นฟอนต์ Quote แล้ว เลือกใช้กับย่อหน้าหรือป้ายได้จากรายการฟอนต์');
+}
+$('gfAdd').addEventListener('click', async () => {
+  const name = $('gfName').value.trim().replace(/\s+/g, ' ');
+  if (!name) return;
+  if (FONTS[name]) { S.quoteFont = name; await ensureFont(name); fillFontSelects(); render(); return; }
+  const btn = $('gfAdd'); btn.disabled = true;
+  FONTS[name] = "'" + name + "', " + GENERIC.sans; FONT_GF[name] = gfUrl(name);
+  let ok = await loadSheet(FONT_GF[name]);
+  if (ok) { try { ok = (await document.fonts.load('400 24px ' + FONTS[name], 'Abc')).length > 0; } catch (e) { ok = false; } }
+  btn.disabled = false;
+  if (!ok) { delete FONTS[name]; delete FONT_GF[name]; toast('ไม่พบฟอนต์ "' + name + '" ใน Google Fonts ลองตรวจการสะกด'); return; }
+  gfLoaded.add(name); $('gfName').value = '';
+  useNewFont(name, name + ' (Google)');
+});
+$('gfName').addEventListener('keydown', e => { if (e.key === 'Enter') $('gfAdd').click(); });
+$('fontFile').addEventListener('change', async e => {
+  const file = e.target.files[0]; e.target.value = '';
+  if (!file) return;
+  const ext = (file.name.split('.').pop() || '').toLowerCase();
+  const fmt = { ttf: 'truetype', otf: 'opentype', woff: 'woff', woff2: 'woff2' }[ext];
+  const mime = { ttf: 'font/ttf', otf: 'font/otf', woff: 'font/woff', woff2: 'font/woff2' }[ext];
+  if (!fmt) { toast('รองรับไฟล์ .ttf .otf .woff .woff2'); return; }
+  if (file.size > 6 * 1024 * 1024) { toast('ไฟล์ฟอนต์ใหญ่เกิน 6 MB'); return; }
+  const buf = await file.arrayBuffer();
+  const base = file.name.replace(/\.[^.]+$/, '').replace(/[^\w\- \u0E00-\u0E7F]/g, '').trim() || 'Custom';
+  const fam = 'UP ' + base;
+  try { const face = new FontFace(fam, buf.slice(0)); await face.load(); document.fonts.add(face); }
+  catch (err) { toast('อ่านไฟล์ฟอนต์ไม่ได้'); return; }
+  const bytes = new Uint8Array(buf); let bin = '';
+  for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+  FONTS[fam] = "'" + fam + "', " + GENERIC.sans;
+  FONT_EMBED[fam] = "@font-face{font-family:'" + fam + "';src:url(data:" + mime + ";base64," + btoa(bin) + ") format('" + fmt + "');}";
+  useNewFont(fam, base + ' (อัปโหลด)');
+});
+document.fonts.addEventListener('loadingdone', () => render());
+fillFontSelects();
+
+// build preset + ratio buttons
+PRESETS.forEach((p, i) => {
+  const bt = document.createElement('button');
+  bt.type = 'button'; bt.className = 'sw-btn'; bt.dataset.i = i;
+  bt.innerHTML = '<i style="background:' + p.bg + '"></i><span>' + p.n + '</span>';
+  bt.addEventListener('click', () => { S.bg = p.bg; S.ink = 'auto'; S.intensity = p.int; syncUI(true); render(); });
+  $('presets').appendChild(bt);
+});
+const SHADOWS = [['stripes', 'แถบเฉียง'], ['blinds', 'บานเกล็ด'], ['window', 'หน้าต่าง'], ['leaves', 'ใบไม้'], ['gradient', 'ไล่เฉด']];
+SHADOWS.forEach(([v, n]) => {
+  const bt = document.createElement('button');
+  bt.type = 'button'; bt.className = 'chip'; bt.dataset.v = v; bt.textContent = n;
+  bt.style.fontFamily = 'var(--f-ui)';
+  bt.addEventListener('click', () => { S.shadowStyle = v; S.shadow = true; render(); });
+  $('shadowStyles').appendChild(bt);
+});
+RATIOS.forEach(r => {
+  const bt = document.createElement('button');
+  bt.type = 'button'; bt.className = 'chip'; bt.dataset.r = r[0]; bt.textContent = r[0];
+  bt.addEventListener('click', () => {
+    const L = Math.max(S.cw, S.ch), sh = Math.round(L * r[2] / r[1]);
+    if (S.ch > S.cw) { S.cw = sh; S.ch = L; } else { S.cw = L; S.ch = sh; }
+    syncUI(); render();
+  });
+  $('ratios').appendChild(bt);
+});
+
+function syncUI(full) {
+  document.querySelectorAll('#presets .sw-btn').forEach(b => b.setAttribute('aria-pressed', String(PRESETS[+b.dataset.i].bg === S.bg.toLowerCase())));
+  const kr = knownRatio(S.cw, S.ch);
+  document.querySelectorAll('#ratios .chip').forEach(b => {
+    const r = RATIOS.find(x => x[0] === b.dataset.r);
+    b.setAttribute('aria-pressed', String(!!kr && kr[0] === r[1] && kr[1] === r[2]));
+  });
+  document.querySelectorAll('#shadowStyles .chip').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === S.shadowStyle)));
+  document.querySelectorAll('#segPattern button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === S.pattern)));
+  document.querySelectorAll('#segInk button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === S.ink)));
+  $('inkC').hidden = S.ink === 'auto';
+  if (full || document.activeElement !== $('bgHex')) $('bgHex').value = S.bg;
+  $('bg').value = S.bg; $('inkC').value = S.inkCustom;
+  $('intensity').value = S.intensity; $('intensityO').textContent = S.intensity + '%';
+  $('cell').value = Math.round(S.cell * 100); $('cellO').textContent = Math.round(S.cell * 100) + '%';
+  $('shadowAmt').value = S.shadowAmt; $('shadowO').textContent = S.shadowAmt + '%';
+  $('quoteSize').value = Math.round(S.quoteSize * 100); $('quoteSizeO').textContent = Math.round(S.quoteSize * 100) + '%';
+  $('bodyCols').value = S.bodyCols; $('bodyColsO').textContent = S.bodyCols;
+  if (document.activeElement !== $('cw')) $('cw').value = S.cw;
+  if (document.activeElement !== $('ch')) $('ch').value = S.ch;
+  ['angles', 'ruler'].forEach(k => { $(k).checked = S[k]; });
+  $('shadowOn').checked = S.shadow; $('shadowBody').classList.toggle('off', !S.shadow);
+  [['quote', 'quoteOn'], ['body', 'bodyOn'], ['label', 'labelOn']].forEach(([n, k]) => {
+    $(n + 'Blk').classList.toggle('off', !S[k]); $(k).checked = S[k];
+    $(n).disabled = !S[k];
+  });
+  ['quoteFont', 'bodyFont', 'labelFont'].forEach(k => { $(k).value = S[k]; });
+}
+
+let raf = 0;
+function render() { cancelAnimationFrame(raf); raf = requestAnimationFrame(draw); }
+function draw() {
+  const svg = build(S);
+  const mat = $('mat');
+  mat.style.setProperty('--ar', S.cw / S.ch);
+  mat.innerHTML = svg;
+  const el = mat.firstElementChild;
+  el.setAttribute('width', '100%'); el.setAttribute('height', '100%');
+  const orient = S.cw === S.ch ? 'จัตุรัส' : (S.cw > S.ch ? 'แนวนอน' : 'แนวตั้ง');
+  $('rdSize').innerHTML = '<b>' + S.cw + ' × ' + S.ch + '</b> px';
+  const kr = knownRatio(S.cw, S.ch);
+  const rl = kr ? (S.cw >= S.ch ? kr[0] + ':' + kr[1] : kr[1] + ':' + kr[0]) : 'กำหนดเอง';
+  $('rdRatio').textContent = rl + ' · ' + orient;
+  $('ratioHint').textContent = kr ? 'พิมพ์ตัวเลขเองได้ที่ช่องกว้าง × สูง' : 'ขนาดกำหนดเอง ไม่ตรงกับอัตราส่วนสำเร็จรูป';
+  syncUI();
+  if ($('code').open) $('codeTa').value = build(S, EXP);
+}
+
+function toast(msg) {
+  const el = $('toast'); el.textContent = msg; el.classList.add('on');
+  clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('on'), 2800);
+}
+
+// controls
+$('bg').addEventListener('input', e => { S.bg = e.target.value.toLowerCase(); render(); });
+$('bgHex').addEventListener('input', e => { const v = e.target.value.trim(); if (/^#[0-9a-f]{6}$/i.test(v)) { S.bg = v.toLowerCase(); render(); } });
+$('bgHex').addEventListener('change', () => { $('bgHex').value = S.bg; });
+$('inkC').addEventListener('input', e => { S.inkCustom = e.target.value; render(); });
+$('segInk').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; S.ink = b.dataset.v; render(); });
+$('segPattern').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; S.pattern = b.dataset.v; render(); });
+$('intensity').addEventListener('input', e => { S.intensity = +e.target.value; render(); });
+$('cell').addEventListener('input', e => { S.cell = +e.target.value / 100; render(); });
+$('shadowAmt').addEventListener('input', e => { S.shadowAmt = +e.target.value; render(); });
+$('quoteSize').addEventListener('input', e => { S.quoteSize = +e.target.value / 100; render(); });
+$('bodyCols').addEventListener('input', e => { S.bodyCols = +e.target.value; render(); });
+['angles', 'ruler'].forEach(k => $(k).addEventListener('change', e => { S[k] = e.target.checked; render(); }));
+$('shadowOn').addEventListener('change', e => { S.shadow = e.target.checked; render(); });
+$('reseed').addEventListener('click', () => { S.seed = (Math.random() * 1e6) | 0; S.shadow = true; render(); });
+[['quoteOn', 'quoteOn'], ['bodyOn', 'bodyOn'], ['labelOn', 'labelOn']].forEach(([id, k]) => $(id).addEventListener('change', e => { S[k] = e.target.checked; render(); }));
+['quote', 'body', 'label'].forEach(k => $(k).addEventListener('input', e => { S[k] = e.target.value; render(); }));
+['quoteFont', 'bodyFont', 'labelFont'].forEach(k => $(k).addEventListener('change', async e => { S[k] = e.target.value; await ensureFont(S[k]); render(); }));
+['cw', 'ch'].forEach(id => {
+  $(id).addEventListener('input', e => { const v = Math.round(+e.target.value); if (v >= 200 && v <= 12000) { S[id] = v; render(); } });
+  $(id).addEventListener('change', e => { S[id] = clamp(Math.round(+e.target.value) || S[id], 200, 12000); e.target.value = S[id]; render(); });
+});
+$('swap').addEventListener('click', () => { const w = S.cw; S.cw = S.ch; S.ch = w; render(); });
+$('code').addEventListener('toggle', () => { if ($('code').open) $('codeTa').value = build(S, EXP); });
+
+$('copy').addEventListener('click', async () => {
+  const svg = build(S, EXP);
+  try { await navigator.clipboard.writeText(svg); toast('คัดลอกโค้ด SVG แล้ว'); }
+  catch (e) {
+    $('code').open = true; const ta = $('codeTa'); ta.value = svg; ta.focus(); ta.select();
+    toast('เลือกโค้ดไว้แล้ว กด Ctrl/⌘+C เพื่อคัดลอก');
+  }
+});
+
+$('dl').addEventListener('click', async () => {
+  const svg = build(S, EXP), name = 'catmut-' + S.cw + 'x' + S.ch + '.svg';
+  let dl = null;
+  try { dl = window.claude ? await window.claude.use('downloads') : null; } catch (e) { dl = null; }
+  if (dl) {
+    try { await dl.save({ filename: name, data: svg }); toast('บันทึก ' + name + ' แล้ว'); }
+    catch (e) {
+      if (e && e.code === 'declined') return;
+      if (e && e.code === 'rate_limited') { toast('รอสักครู่แล้วกดอีกครั้ง'); return; }
+      toast('ดาวน์โหลดไม่สำเร็จ ลองกด "คัดลอกโค้ด SVG" แทน');
+    }
+    return;
+  }
+  try {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
+    a.download = name; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  } catch (e) { toast('ดาวน์โหลดไม่สำเร็จ ลองกด "คัดลอกโค้ด SVG" แทน'); }
+});
+
+$('dlPng').addEventListener('click', async () => {
+  const btn = $('dlPng'), name = 'catmut-' + S.cw + 'x' + S.ch + '.png';
+  btn.disabled = true;
+  let blob;
+  try {
+    const svg = build(S, { embed: true });
+    const img = new Image();
+    await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg); });
+    const c = document.createElement('canvas'); c.width = S.cw; c.height = S.ch;
+    c.getContext('2d').drawImage(img, 0, 0, S.cw, S.ch);
+    blob = await new Promise((res, rej) => c.toBlob(b => b ? res(b) : rej(new Error('empty')), 'image/png'));
+  } catch (e) {
+    btn.disabled = false; toast('สร้าง PNG ไม่สำเร็จ ลองลดขนาดภาพแล้วลองใหม่'); return;
+  }
+  btn.disabled = false;
+  let dl = null;
+  try { dl = window.claude ? await window.claude.use('downloads') : null; } catch (e) { dl = null; }
+  if (dl) {
+    try { await dl.save({ filename: name, data: blob }); toast('บันทึก ' + name + ' แล้ว'); }
+    catch (e) {
+      if (e && e.code === 'declined') return;
+      if (e && e.code === 'rate_limited') { toast('รอสักครู่แล้วกดอีกครั้ง'); return; }
+      toast('ดาวน์โหลด PNG ไม่สำเร็จ');
+    }
+    return;
+  }
+  try {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  } catch (e) { toast('ดาวน์โหลด PNG ไม่สำเร็จ'); }
+});
+
+$('quote').value = S.quote; $('body').value = S.body; $('label').value = S.label;
+syncUI(true); draw();
+if (document.fonts && document.fonts.load) {
+  Promise.all([document.fonts.load('400 24px Newsreader'), document.fonts.ready]).then(render).catch(() => {});
+}
+</script>
+
+</body></html>
