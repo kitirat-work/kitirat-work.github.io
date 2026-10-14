@@ -96,6 +96,7 @@ textarea{width:100%;resize:vertical;line-height:1.45}
 .sw input:checked + .track{background:var(--accent)}
 .sw input:checked + .track::after{transform:translateX(14px)}
 .sw input:focus-visible + .track{outline:2px solid var(--accent);outline-offset:2px}
+[hidden]{display:none!important}
 .blk{display:flex;flex-direction:column;gap:8px}
 .blk.off .body{opacity:.45;pointer-events:none}
 .body{display:flex;flex-direction:column;gap:8px}
@@ -154,11 +155,16 @@ textarea{width:100%;resize:vertical;line-height:1.45}
     </section>
 
     <section class="sec">
-      <h2>ลวดลาย · ซ้อนได้หลายเลเยอร์</h2>
+      <h2>ลวดลาย · เลเยอร์ล่าง ซ้อนได้หลายอัน</h2>
       <div class="chips" id="layers" role="group" aria-label="เลเยอร์ลวดลาย"></div>
       <p class="hint" id="patternHint"></p>
       <div class="row" id="fibRow" hidden><span>Fibonacci ด้านเล็กอยู่ทาง</span>
         <div class="seg" id="segFib"><button type="button" data-v="left">ซ้าย</button><button type="button" data-v="right">ขวา</button></div></div>
+      <div class="blk" id="labelBlk" hidden>
+        <span>ข้อความป้ายแนวตั้งมุมซ้ายบน</span>
+        <textarea id="label" rows="2" aria-label="ข้อความป้ายแนวตั้ง"></textarea>
+        <p class="hint">ใช้ {ratio} {year} {size} แทนค่าอัตโนมัติได้</p>
+      </div>
       <div class="row"><span>ขนาดช่อง</span><div class="ctl"><input type="range" id="cell" min="60" max="160" step="5"><output id="cellO"></output></div></div>
     </section>
 
@@ -173,13 +179,13 @@ textarea{width:100%;resize:vertical;line-height:1.45}
     </section>
 
     <section class="sec">
-      <h2>ข้อความ</h2>
+      <h2>ข้อความ · เลเยอร์บน</h2>
+      <div class="row"><span>ฟอนต์ (ใช้กับข้อความทั้งหมด)</span><select id="fontAll" aria-label="ฟอนต์ของข้อความทั้งหมด"></select></div>
+      <label class="sw"><input type="checkbox" id="plateOn"><span class="track"></span><span>พื้นกล่องหลังข้อความ (บังเส้นกริด)</span></label>
       <div class="blk" id="quoteBlk">
         <label class="sw"><input type="checkbox" id="quoteOn"><span class="track"></span><span>Quote กลางภาพ</span></label>
         <div class="body">
           <textarea id="quote" rows="2" aria-label="ข้อความ Quote" placeholder="พิมพ์ข้อความ (ขึ้นบรรทัดใหม่ได้)"></textarea>
-          <div class="row"><span>ฟอนต์</span>
-            <select id="quoteFont" aria-label="ฟอนต์ Quote"></select></div>
           <div class="row"><span>ขนาดตัวอักษร</span><div class="ctl"><input type="range" id="quoteSize" min="50" max="180" step="5"><output id="quoteSizeO"></output></div></div>
         </div>
       </div>
@@ -187,16 +193,7 @@ textarea{width:100%;resize:vertical;line-height:1.45}
         <label class="sw"><input type="checkbox" id="bodyOn"><span class="track"></span><span>ย่อหน้ามุมขวาล่าง</span></label>
         <div class="body">
           <textarea id="body" rows="4" aria-label="ข้อความย่อหน้า" placeholder="ข้อความย่อหน้า"></textarea>
-          <div class="row"><span>ฟอนต์</span><select id="bodyFont" aria-label="ฟอนต์ย่อหน้า"></select></div>
           <div class="row"><span>ความกว้างกล่อง (ช่อง)</span><div class="ctl"><input type="range" id="bodyCols" min="2" max="6" step="1"><output id="bodyColsO"></output></div></div>
-        </div>
-      </div>
-      <div class="blk" id="labelBlk">
-        <label class="sw"><input type="checkbox" id="labelOn"><span class="track"></span><span>ป้ายแนวตั้งมุมซ้ายบน</span></label>
-        <div class="body">
-          <textarea id="label" rows="2" aria-label="ข้อความป้ายแนวตั้ง"></textarea>
-          <div class="row"><span>ฟอนต์</span><select id="labelFont" aria-label="ฟอนต์ป้าย"></select></div>
-          <p class="hint">ใช้ {ratio} {year} {size} แทนค่าอัตโนมัติได้</p>
         </div>
       </div>
     </section>
@@ -379,6 +376,7 @@ function build(S, opts) {
   const x0 = mx, y0 = tp, x1 = W - mx, y1 = H - bt, fw = x1 - x0, fh = y1 - y0;
   let cell = 0.153 * b * S.cell;
   cell = Math.min(cell, fw / 3, fh / 3);
+  const famAll = FONTS[S.font] || FONTS.sans;
   const strip = 0.4 * cell, ox = x0 + strip, oy = y1 - strip;
   const bg = S.bg;
   const ink = S.ink === 'auto' ? (lum(bg) > 0.5 ? '#2b2926' : '#ffffff') : S.inkCustom;
@@ -548,7 +546,7 @@ function build(S, opts) {
       arcD += 'M' + f(X(a.S[0])) + ' ' + f(Y(a.S[1])) + 'A' + f(a.r * sc) + ' ' + f(a.r * sc) + ' 0 0 ' + (a.sg > 0 ? 1 : 0) + ' ' + f(X(a.E[0])) + ' ' + f(Y(a.E[1]));
     });
     layerSvg += path(sqD, 2.8, 0.9, ' stroke-linejoin="miter"') + path(arcD, 2.8, 0.9, ' stroke-linecap="round"');
-    if (lab) fibText = '<g font-family="' + FONTS.mono + '" font-size="' + f(lf) + '" fill="' + ink + '" fill-opacity="' + op(0.5) + '">' + lab + '</g>';
+    if (lab) fibText = '<g font-family="' + famAll + '" font-size="' + f(lf) + '" fill="' + ink + '" fill-opacity="' + op(0.5) + '">' + lab + '</g>';
   }
 
   // angle lines from the bottom-left corner of the mat
@@ -568,7 +566,7 @@ function build(S, opts) {
       const r = d * Math.PI / 180;
       angLabels += '<text x="' + f(x0 + Math.cos(r) * dist + 3 * t) + '" y="' + f(y1 - Math.sin(r) * dist + lf * 0.35) + '">' + d + '°</text>';
     });
-    angLabels = '<g font-family="' + FONTS.sans + '" font-size="' + f(lf) + '" fill="' + ink + '" fill-opacity="' + op(0.5) + '">' + angLabels + '</g>';
+    angLabels = '<g font-family="' + famAll + '" font-size="' + f(lf) + '" fill="' + ink + '" fill-opacity="' + op(0.5) + '">' + angLabels + '</g>';
   }
 
   // ruler ticks and numbers outside the frame
@@ -592,25 +590,26 @@ function build(S, opts) {
         nums += '<text x="' + f(x1 + gap + lmaj + pad) + '" y="' + f(y + fsz * 0.35) + '" text-anchor="start">' + (i / sub) + '</text>';
       }
     }
-    nums = '<g font-family="' + FONTS.mono + '" font-size="' + f(fsz) + '" fill="' + ink + '" fill-opacity="' + op(0.55) + '">' + nums + '</g>';
+    nums = '<g font-family="' + famAll + '" font-size="' + f(fsz) + '" fill="' + ink + '" fill-opacity="' + op(0.55) + '">' + nums + '</g>';
   }
 
-  // text boxes (mask the grid) and text
-  let masks = '', texts = '';
+  // text layer: drawn above every grid layer and placed on its own, not snapped to the lattice
+  let masks = '', texts = '', labelSvg = '';
+  const plate = S.plate !== false;
   const cxF = (x0 + x1) / 2, cyF = (y0 + y1) / 2;
 
   if (S.quoteOn && S.quote.trim()) {
     const lines = S.quote.split('\n').map(l => l.trim()).filter(Boolean).slice(0, 4);
-    const fam = FONTS[S.quoteFont] || FONTS.sans;
+    const fam = famAll;
     const fs = cell * 0.24 * S.quoteSize;
     const maxW = Math.max.apply(null, lines.map(l => tw(l, fs, fam)));
     const lh = fs * 1.02, textH = lh * lines.length;
     const n = Math.max(2, Math.ceil((maxW + cell * 0.7) / cell));
     const r = Math.max(1, Math.ceil((textH + cell * 0.5) / cell));
-    const kx = Math.round((cxF - ox) / cell - n / 2);
-    const ky = Math.round((oy - cyF) / cell - r / 2);
-    const bx = ox + kx * cell, bw = n * cell, by = oy - (ky + r) * cell, bh = r * cell;
-    masks += '<rect x="' + f(bx) + '" y="' + f(by) + '" width="' + f(bw) + '" height="' + f(bh) + '"/>';
+    const bw = n * cell, bh = r * cell, bx = cxF - bw / 2, by = cyF - bh / 2;
+    if (plate) {
+      masks += '<rect x="' + f(bx) + '" y="' + f(by) + '" width="' + f(bw) + '" height="' + f(bh) + '"/>';
+    }
     const cx = bx + bw / 2, cy = by + bh / 2;
     let tsp = '';
     lines.forEach((l, i) => {
@@ -620,15 +619,16 @@ function build(S, opts) {
   }
 
   if (S.bodyOn && S.body.trim()) {
-    const fam = FONTS[S.bodyFont] || FONTS.sans, fs = cell * 0.095, lh = fs * 1.38;
-    const left = ox + Math.max(0, Math.floor((x1 - ox - S.bodyCols * cell) / cell)) * cell;
+    const fam = famAll, fs = cell * 0.095, lh = fs * 1.38;
+    const left = Math.max(x0, x1 - S.bodyCols * cell);
     const maxW = Math.max(cell * 0.8, x1 - left - cell * 0.7);
     const lines = wrapText(S.body, fs, fam, maxW);
     const textH = lines.length * lh;
-    const r = Math.max(1, Math.ceil((textH + cell * 0.7 - strip) / cell));
-    const by = oy - r * cell;
-    masks += '<rect x="' + f(left) + '" y="' + f(by) + '" width="' + f(x1 - left) + '" height="' + f(y1 - by) + '"/>';
-    const top = by + (y1 - by - textH) / 2;
+    const bh = textH + cell * 0.44, by = y1 - bh;
+    if (plate) {
+      masks += '<rect x="' + f(left) + '" y="' + f(by) + '" width="' + f(x1 - left) + '" height="' + f(bh) + '"/>';
+    }
+    const top = by + (bh - textH) / 2;
     let tsp = '';
     lines.forEach((l, i) => {
       tsp += '<tspan x="' + f(left + cell * 0.35) + '" y="' + f(top + lh * (i + 0.5) + fs * 0.33) + '">' + esc(l) + '</tspan>';
@@ -636,22 +636,25 @@ function build(S, opts) {
     texts += '<text font-family="' + fam + '" font-size="' + f(fs) + '" fill="' + ink + '" fill-opacity="' + op(0.85) + '">' + tsp + '</text>';
   }
 
-  if (S.labelOn && S.label.trim()) {
+  if (L.label && S.label.trim()) {
     const raw = S.label.replace(/\{ratio\}/g, ratioLabel(W, H)).replace(/\{year\}/g, String(new Date().getFullYear())).replace(/\{size\}/g, W + '×' + H);
     const lines = raw.split('\n').map(l => l.trim()).filter(Boolean).slice(0, 3);
     const fs = Math.max(7, cell * 0.058), lh = fs * 1.4;
-    const fam = FONTS[S.labelFont] || FONTS.sans;
+    const fam = famAll;
     const len = Math.max.apply(null, lines.map(l => tw(l.toUpperCase(), fs, fam) * 1.07));
-    masks += '<rect x="' + f(x0) + '" y="' + f(y0) + '" width="' + f(strip) + '" height="' + f(Math.min(fh, len + cell * 0.45)) + '"/>';
+    const lh2 = Math.min(fh, len + cell * 0.45);
+    if (plate) {
+      labelSvg += '<rect x="' + f(x0) + '" y="' + f(y0) + '" width="' + f(strip) + '" height="' + f(lh2) + '" fill="' + bg + '" stroke="none"/>';
+    }
     const bx = x0 + strip * 0.5 + (lines.length - 1) * lh * 0.5, by = y0 + cell * 0.22;
     let tsp = '';
     lines.forEach((l, i) => { tsp += '<tspan x="0" y="' + f(i * lh) + '">' + esc(l.toUpperCase()) + '</tspan>'; });
-    texts += '<g transform="translate(' + f(bx) + ' ' + f(by) + ') rotate(90)"><text font-family="' + fam + '" font-size="' + f(fs) + '" letter-spacing="' + f(fs * 0.07) + '" fill="' + ink + '" fill-opacity="' + op(0.85) + '">' + tsp + '</text></g>';
+    labelSvg += '<g transform="translate(' + f(bx) + ' ' + f(by) + ') rotate(90)"><text font-family="' + fam + '" font-size="' + f(fs) + '" letter-spacing="' + f(fs * 0.07) + '" fill="' + ink + '" fill-opacity="' + op(0.85) + '">' + tsp + '</text></g>';
   }
 
   let svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '">';
   if (opts && opts.embed) {
-    const used = [S.quoteOn && S.quote.trim() ? S.quoteFont : null, S.bodyOn && S.body.trim() ? S.bodyFont : null, S.labelOn && S.label.trim() ? S.labelFont : null].filter(Boolean);
+    const used = [S.font];
     const uniq = Array.from(new Set(used));
     let css = '';
     if (opts.imports) uniq.forEach(id => { if (FONT_GF[id]) css += '@import url(' + FONT_GF[id] + ');'; });
@@ -659,7 +662,7 @@ function build(S, opts) {
     if (css) svg += '<defs><style><![CDATA[' + css + ']]></style></defs>';
   }
   svg += '<rect width="' + W + '" height="' + H + '" fill="' + bg + '"/>';
-  svg += '<g fill="none" stroke="' + ink + '">' + (defsSvg ? '<defs>' + defsSvg + '</defs>' : '') + layerSvg + '</g>';
+  svg += '<g fill="none" stroke="' + ink + '">' + (defsSvg ? '<defs>' + defsSvg + '</defs>' : '') + layerSvg + '</g>' + labelSvg;
   if (masks) svg += '<g fill="' + bg + '">' + masks + '</g>';
   if (L.frame) svg += '<rect x="' + f(x0) + '" y="' + f(y0) + '" width="' + f(fw) + '" height="' + f(fh) + '" fill="none" stroke="' + ink + '" stroke-opacity="' + op(0.8) + '" stroke-width="' + f(2.4 * q) + '"/>';
   if (ticks) svg += '<path d="' + ticks + '" fill="none" stroke="' + ink + '" stroke-opacity="' + op(0.5) + '" stroke-width="' + f(1 * q) + '"/>';
@@ -674,13 +677,13 @@ function build(S, opts) {
 const $ = id => document.getElementById(id);
 const S = {
   bg: '#1c9272', ink: 'auto', inkCustom: '#ffffff', intensity: 100,
-  layers: { grid: true, mm: false, quilt: false, iso: false, circle: false, dots: false, cross: false, fib: false, angles: true, frame: true, ruler: true },
+  layers: { grid: true, mm: false, quilt: false, iso: false, circle: false, dots: false, cross: false, fib: false, angles: true, frame: true, ruler: true, label: true },
   fibSide: 'left',
-  cw: 2560, ch: 1600, cell: 1,
+  cw: 2560, ch: 1600, cell: 0.95,
   shadow: true, shadowAmt: 70, seed: 7, shadowStyle: 'stripes',
-  quoteOn: true, quote: 'Stay Focused.', quoteSize: 1, quoteFont: 'Newsreader', bodyFont: 'sans', labelFont: 'sans',
-  bodyOn: true, body: "Don't let distractions dilute your potential. Instead, direct your attention toward what truly matters, silence the noise that surrounds you, pursue your priorities with intention, and watch clarity transform into extraordinary results.", bodyCols: 3,
-  labelOn: true, label: 'CUTTING MAT WALLPAPER PACK\n{ratio} ASPECT RATIO - {year}'
+  plate: true, quoteOn: true, quote: 'Stay Sharp.', quoteSize: 1, font: 'Newsreader',
+  bodyOn: true, body: "Dull tools make tired hands. Rest, sharpen your skills, and return to the work with an edge that makes the hard parts feel easy.", bodyCols: 3,
+  label: 'CAT MUT - CUT MAT WALLPAPER PACK\n{ratio} ASPECT RATIO - {year}'
 };
 const PRESETS = [
   { n: 'เขียว', bg: '#1c9272', int: 100 },
@@ -726,7 +729,7 @@ async function ensureFont(id) {
   try { await document.fonts.load('400 24px ' + FONTS[id], sampleText()); } catch (e) { /* ignore */ }
 }
 function fillFontSelects() {
-  ['quoteFont', 'bodyFont', 'labelFont'].forEach(k => {
+  ['fontAll'].forEach(k => {
     const sel = $(k); sel.innerHTML = '';
     const add = (label, items) => {
       const g = document.createElement('optgroup'); g.label = label;
@@ -736,18 +739,18 @@ function fillFontSelects() {
     add('ระบบ', [['sans', 'Helvetica / Arial'], ['serif', 'Georgia'], ['mono', 'Mono']]);
     GF_GROUPS.forEach(([lab, , names]) => add(lab, names.map(n => [n, n])));
     if (customAdded.length) add('เพิ่มเอง', customAdded.map(c => [c.id, c.label]));
-    sel.value = S[k];
+    sel.value = S.font;
   });
 }
 function useNewFont(id, label) {
   customAdded.push({ id, label });
-  S.quoteFont = id; fillFontSelects(); render();
-  toast('ตั้ง "' + label + '" เป็นฟอนต์ Quote แล้ว เลือกใช้กับย่อหน้าหรือป้ายได้จากรายการฟอนต์');
+  S.font = id; fillFontSelects(); render();
+  toast('ใช้ฟอนต์ "' + label + '" กับข้อความทั้งหมดแล้ว');
 }
 $('gfAdd').addEventListener('click', async () => {
   const name = $('gfName').value.trim().replace(/\s+/g, ' ');
   if (!name) return;
-  if (FONTS[name]) { S.quoteFont = name; await ensureFont(name); fillFontSelects(); render(); return; }
+  if (FONTS[name]) { S.font = name; await ensureFont(name); fillFontSelects(); render(); return; }
   const btn = $('gfAdd'); btn.disabled = true;
   FONTS[name] = "'" + name + "', " + GENERIC.sans; FONT_GF[name] = gfUrl(name);
   let ok = await loadSheet(FONT_GF[name]);
@@ -798,6 +801,7 @@ const LAYERS = [
   ['cross', 'กากบาท', 'เครื่องหมายบวกเล็กๆ ตามจุดตัดกริด'],
   ['fib', 'Fibonacci', 'สี่เหลี่ยมขนาด 1 1 2 3 5 8 … ต่อกันเป็นสี่เหลี่ยมสัดส่วนทอง พร้อมเกลียวทองคำ'],
   ['angles', 'เส้นมุม 15°–75°', 'เส้นทแยง 45° และเส้นประ 15° 30° 60° 75° จากมุมซ้ายล่าง พร้อมตัวเลของศา'],
+  ['label', 'ป้ายแนวตั้ง', 'ป้ายข้อความแนวตั้งมุมซ้ายบน อยู่ในเลเยอร์ล่างร่วมกับกริด แก้ข้อความได้ด้านล่าง'],
   ['frame', 'กรอบ', 'กรอบสี่เหลี่ยมรอบพื้นที่ลวดลาย'],
   ['ruler', 'ไม้บรรทัดขอบ', 'ขีดและตัวเลขรอบขอบด้านบน ซ้าย และขวา']
 ];
@@ -838,6 +842,7 @@ function syncUI(full) {
   document.querySelectorAll('#shadowStyles .chip').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === S.shadowStyle)));
   document.querySelectorAll('#layers .chip').forEach(b => b.setAttribute('aria-pressed', String(!!S.layers[b.dataset.v])));
   $('fibRow').hidden = !S.layers.fib;
+  $('labelBlk').hidden = !S.layers.label;
   document.querySelectorAll('#segFib button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === S.fibSide)));
   $('patternHint').textContent = (LAYERS.find(x => x[0] === lastLayer) || [])[2] || '';
   document.querySelectorAll('#segInk button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === S.ink)));
@@ -851,12 +856,13 @@ function syncUI(full) {
   $('bodyCols').value = S.bodyCols; $('bodyColsO').textContent = S.bodyCols;
   if (document.activeElement !== $('cw')) $('cw').value = S.cw;
   if (document.activeElement !== $('ch')) $('ch').value = S.ch;
+  $('plateOn').checked = S.plate;
   $('shadowOn').checked = S.shadow; $('shadowBody').classList.toggle('off', !S.shadow);
-  [['quote', 'quoteOn'], ['body', 'bodyOn'], ['label', 'labelOn']].forEach(([n, k]) => {
+  [['quote', 'quoteOn'], ['body', 'bodyOn']].forEach(([n, k]) => {
     $(n + 'Blk').classList.toggle('off', !S[k]); $(k).checked = S[k];
     $(n).disabled = !S[k];
   });
-  ['quoteFont', 'bodyFont', 'labelFont'].forEach(k => { $(k).value = S[k]; });
+  $('fontAll').value = S.font;
 }
 
 let raf = 0;
@@ -895,11 +901,12 @@ $('cell').addEventListener('input', e => { S.cell = +e.target.value / 100; rende
 $('shadowAmt').addEventListener('input', e => { S.shadowAmt = +e.target.value; render(); });
 $('quoteSize').addEventListener('input', e => { S.quoteSize = +e.target.value / 100; render(); });
 $('bodyCols').addEventListener('input', e => { S.bodyCols = +e.target.value; render(); });
+$('plateOn').addEventListener('change', e => { S.plate = e.target.checked; render(); });
 $('shadowOn').addEventListener('change', e => { S.shadow = e.target.checked; render(); });
 $('reseed').addEventListener('click', () => { S.seed = (Math.random() * 1e6) | 0; S.shadow = true; render(); });
-[['quoteOn', 'quoteOn'], ['bodyOn', 'bodyOn'], ['labelOn', 'labelOn']].forEach(([id, k]) => $(id).addEventListener('change', e => { S[k] = e.target.checked; render(); }));
+[['quoteOn', 'quoteOn'], ['bodyOn', 'bodyOn']].forEach(([id, k]) => $(id).addEventListener('change', e => { S[k] = e.target.checked; render(); }));
 ['quote', 'body', 'label'].forEach(k => $(k).addEventListener('input', e => { S[k] = e.target.value; render(); }));
-['quoteFont', 'bodyFont', 'labelFont'].forEach(k => $(k).addEventListener('change', async e => { S[k] = e.target.value; await ensureFont(S[k]); render(); }));
+$('fontAll').addEventListener('change', async e => { S.font = e.target.value; await ensureFont(S.font); render(); });
 ['cw', 'ch'].forEach(id => {
   $(id).addEventListener('input', e => { const v = Math.round(+e.target.value); if (v >= 200 && v <= 12000) { S[id] = v; render(); } });
   $(id).addEventListener('change', e => { S[id] = clamp(Math.round(+e.target.value) || S[id], 200, 12000); e.target.value = S[id]; render(); });
