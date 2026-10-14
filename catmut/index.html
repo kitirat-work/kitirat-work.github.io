@@ -79,7 +79,7 @@ textarea{width:100%;resize:vertical;line-height:1.45}
 .seg button{border:0;background:none;padding:6px 12px;cursor:pointer;font-size:13px;border-right:1px solid var(--line)}
 .seg button:last-child{border-right:0}
 .seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
-.swatches{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.swatches{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
 .sw-btn{display:flex;flex-direction:column;align-items:stretch;gap:6px;border:1px solid var(--line);background:var(--field);padding:6px;border-radius:4px;cursor:pointer;font-size:12px}
 .sw-btn i{display:block;block-size:30px;border-radius:2px;border:1px solid rgba(0,0,0,.12)}
 .sw-btn[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
@@ -381,7 +381,7 @@ function build(S, opts) {
   cell = Math.min(cell, fw / 3, fh / 3);
   const strip = 0.4 * cell, ox = x0 + strip, oy = y1 - strip;
   const bg = S.bg;
-  const ink = S.ink === 'auto' ? (lum(bg) > 0.6 ? '#2b2926' : '#ffffff') : S.inkCustom;
+  const ink = S.ink === 'auto' ? (lum(bg) > 0.5 ? '#2b2926' : '#ffffff') : S.inkCustom;
   const k = S.intensity / 100;
   const op = v => f(Math.min(1, v * k));
   const q = Math.max(1, t);
@@ -683,10 +683,11 @@ const S = {
   labelOn: true, label: 'CUTTING MAT WALLPAPER PACK\n{ratio} ASPECT RATIO - {year}'
 };
 const PRESETS = [
-  { n: 'กระดาษ', bg: '#f7f5f2', int: 100 },
   { n: 'เขียว', bg: '#1c9272', int: 100 },
-  { n: 'ส้ม', bg: '#d55f1e', int: 100 },
-  { n: 'ดำ', bg: '#0b0b0b', int: 45 }
+  { n: 'ถ่าน', bg: '#17181c', int: 50 },
+  { n: 'เทาอ่อน', bg: '#d8d8d8', int: 100 },
+  { n: 'ม่วงเข้ม', bg: '#382030', int: 75 },
+  { n: 'ฟ้าม่วง', bg: '#7c8db2', int: 100 }
 ];
 const RATIOS = [['16:10', 16, 10], ['16:9', 16, 9], ['21:9', 21, 9], ['3:2', 3, 2], ['4:3', 4, 3], ['1:1', 1, 1], ['19.5:9', 19.5, 9]];
 const EXP = { embed: true, imports: true };
