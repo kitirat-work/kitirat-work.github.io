@@ -597,6 +597,10 @@ function build(S, opts) {
   let masks = '', texts = '', labelSvg = '';
   const plate = S.plate !== false;
   const cxF = (x0 + x1) / 2, cyF = (y0 + y1) / 2;
+  // plate edges sit exactly on grid lines (never cut through them)
+  const snX = (v, up) => ox + (up ? Math.ceil : Math.floor)((v - ox) / m - 1e-6) * m;
+  const ie = 1.2 * q; // inset so the plate edge stops at the line's edge instead of covering half its stroke
+  const snY = (v, up) => oy + (up ? Math.floor : Math.ceil)((v - oy) / m + 1e-6) * m;
 
   if (S.quoteOn && S.quote.trim()) {
     const lines = S.quote.split('\n').map(l => l.trim()).filter(Boolean).slice(0, 4);
@@ -606,11 +610,13 @@ function build(S, opts) {
     const lh = fs * 1.02, textH = lh * lines.length;
     const n = Math.max(2, Math.ceil((maxW + cell * 0.7) / cell));
     const r = Math.max(1, Math.ceil((textH + cell * 0.5) / cell));
-    const bw = n * cell, bh = r * cell, bx = cxF - bw / 2, by = cyF - bh / 2;
+    const needW = maxW + cell * 0.7, needH = textH + cell * 0.5;
+    const px0 = snX(cxF - needW / 2, false), px1 = snX(cxF + needW / 2, true);
+    const py0 = snY(cyF - needH / 2, true), py1 = snY(cyF + needH / 2, false);
     if (plate) {
-      masks += '<rect x="' + f(bx) + '" y="' + f(by) + '" width="' + f(bw) + '" height="' + f(bh) + '"/>';
+      masks += '<rect x="' + f(px0 + ie) + '" y="' + f(py0 + ie) + '" width="' + f(px1 - px0 - 2 * ie) + '" height="' + f(py1 - py0 - 2 * ie) + '"/>';
     }
-    const cx = bx + bw / 2, cy = by + bh / 2;
+    const cx = cxF, cy = cyF;
     let tsp = '';
     lines.forEach((l, i) => {
       tsp += '<tspan x="' + f(cx) + '" y="' + f(cy - textH / 2 + lh * (i + 0.5) + fs * 0.33) + '">' + esc(l) + '</tspan>';
@@ -620,13 +626,13 @@ function build(S, opts) {
 
   if (S.bodyOn && S.body.trim()) {
     const fam = famAll, fs = cell * 0.095, lh = fs * 1.38;
-    const left = Math.max(x0, x1 - S.bodyCols * cell);
+    const left = Math.max(ox, snX(x1 - S.bodyCols * cell, false));
     const maxW = Math.max(cell * 0.8, x1 - left - cell * 0.7);
     const lines = wrapText(S.body, fs, fam, maxW);
     const textH = lines.length * lh;
-    const bh = textH + cell * 0.44, by = y1 - bh;
+    const by = Math.max(y0, snY(y1 - (textH + cell * 0.44), true)), bh = y1 - by;
     if (plate) {
-      masks += '<rect x="' + f(left) + '" y="' + f(by) + '" width="' + f(x1 - left) + '" height="' + f(bh) + '"/>';
+      masks += '<rect x="' + f(left + ie) + '" y="' + f(by + ie) + '" width="' + f(x1 - left - ie) + '" height="' + f(bh - ie) + '"/>';
     }
     const top = by + (bh - textH) / 2;
     let tsp = '';
@@ -642,9 +648,9 @@ function build(S, opts) {
     const fs = Math.max(7, cell * 0.058), lh = fs * 1.4;
     const fam = famAll;
     const len = Math.max.apply(null, lines.map(l => tw(l.toUpperCase(), fs, fam) * 1.07));
-    const lh2 = Math.min(fh, len + cell * 0.45);
+    const lh2 = Math.min(fh, snY(y0 + len + cell * 0.45, false) - y0);
     if (plate) {
-      labelSvg += '<rect x="' + f(x0) + '" y="' + f(y0) + '" width="' + f(strip) + '" height="' + f(lh2) + '" fill="' + bg + '" stroke="none"/>';
+      labelSvg += '<rect x="' + f(x0) + '" y="' + f(y0) + '" width="' + f(strip - ie) + '" height="' + f(lh2 - ie) + '" fill="' + bg + '" stroke="none"/>';
     }
     const bx = x0 + strip * 0.5 + (lines.length - 1) * lh * 0.5, by = y0 + cell * 0.22;
     let tsp = '';
@@ -680,7 +686,7 @@ const S = {
   layers: { grid: true, mm: false, quilt: false, iso: false, circle: false, dots: false, cross: false, fib: false, angles: true, frame: true, ruler: true, label: true },
   fibSide: 'left',
   cw: 2560, ch: 1600, cell: 0.95,
-  shadow: true, shadowAmt: 70, seed: 7, shadowStyle: 'stripes',
+  shadow: false, shadowAmt: 70, seed: 7, shadowStyle: 'stripes',
   plate: true, quoteOn: true, quote: 'Stay Sharp.', quoteSize: 1, font: 'Newsreader',
   bodyOn: true, body: "Dull tools make tired hands. Rest, sharpen your skills, and return to the work with an edge that makes the hard parts feel easy.", bodyCols: 3,
   label: 'CAT MUT - CUT MAT WALLPAPER PACK\n{ratio} ASPECT RATIO - {year}'
