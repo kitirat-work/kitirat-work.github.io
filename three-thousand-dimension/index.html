@@ -245,6 +245,7 @@ svg.cube path.edge { fill: var(--f-top); }
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><pattern id="isoDots" width="5" height="5" patternUnits="userSpaceOnUse"><rect width="5" height="5" fill="#ffffff"/><circle cx="2.5" cy="2.5" r="1.05" fill="#15171c"/></pattern></defs></svg>
 <div id="app"></div>
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script>
 /* ===== Question generator: deterministic from a seed (integer math only for logic) ===== */
 const GEN = (() => {
@@ -834,6 +835,86 @@ const GEN = (() => {
 })();
 
 
+/* ===== P2P room via PeerJS (star topology: host relays everyone's presence) ===== */
+const P2P = (() => {
+  const PREFIX = 'isoarena-th-';
+  const clean = pr => {
+    const o = { r: 'p' };
+    if (!pr || typeof pr !== 'object') return o;
+    if (typeof pr.nm === 'string') o.nm = pr.nm.slice(0, 24);
+    if (pr.a && typeof pr.a === 'object' && Number.isInteger(pr.a.q) && Number.isInteger(pr.a.c)) o.a = { q: pr.a.q, c: pr.a.c };
+    return o;
+  };
+  function join(code, asHost) {
+    return new Promise((resolve, reject) => {
+      let settled = false, left = false, myId = null;
+      const mine = {}, map = new Map(), conns = new Map(), subs = [], errSubs = [];
+      let hostConn = null, peer;
+      const snap = () => Array.from(map.entries()).map(([id, presence]) => Object.freeze({ peer: id, presence, sameTab: id === myId, isMe: id === myId, kind: 'viewer', by: null, guest: false }));
+      const fire = (joined = []) => { const ps = snap(); for (const f of subs) { try { f({ peers: ps, joined, left: [], updated: [] }); } catch (e) { console.error(e); } } };
+      const broadcast = () => { const msg = { t: 's', peers: Array.from(map.entries()) }; for (const c of conns.values()) { if (c.open) { try { c.send(msg); } catch (e) { } } } };
+      const fail = c => { if (settled) return; settled = true; clearTimeout(timer); try { peer && peer.destroy(); } catch (e) { } reject({ code: c }); };
+      const timer = setTimeout(() => fail(asHost ? 'network' : 'not_found'), 15000);
+      const api = {
+        presence: async patch => {
+          for (const k in patch) { if (patch[k] === null) delete mine[k]; else mine[k] = patch[k]; }
+          if (asHost) { map.set(myId, JSON.parse(JSON.stringify(mine))); fire(); broadcast(); }
+          else if (hostConn && hostConn.open) hostConn.send({ t: 'p', presence: mine });
+        },
+        onPeers: (fn, onErr) => { subs.push(fn); if (onErr) errSubs.push(onErr); setTimeout(() => { const ps = snap(); fn({ peers: ps, joined: ps, left: [], updated: [] }); }, 0); return () => { }; },
+        peers: snap,
+        leave: async () => { left = true; try { peer.destroy(); } catch (e) { } },
+      };
+      try { peer = asHost ? new Peer(PREFIX + code.toLowerCase()) : new Peer(); }
+      catch (e) { return fail('network'); }
+      peer.on('error', err => {
+        const t = err && err.type;
+        if (!settled) fail(t === 'unavailable-id' ? 'taken' : t === 'peer-unavailable' ? 'not_found' : 'network');
+      });
+      if (asHost) {
+        peer.on('open', id => { myId = id; map.set(id, {}); settled = true; clearTimeout(timer); resolve(api); });
+        peer.on('connection', conn => {
+          conns.set(conn.peer, conn);
+          const add = () => { if (!map.has(conn.peer)) { map.set(conn.peer, { r: 'p' }); fire(snap().filter(p => p.peer === conn.peer)); } };
+          conn.on('open', () => { add(); broadcast(); });
+          conn.on('data', d => { if (d && d.t === 'p' && conns.has(conn.peer)) { add(); map.set(conn.peer, clean(d.presence)); fire(); broadcast(); } });
+          const gone = () => { if (conns.delete(conn.peer)) { map.delete(conn.peer); fire(); broadcast(); } };
+          conn.on('close', gone); conn.on('error', gone);
+        });
+        peer.on('disconnected', () => { if (!left) { try { peer.reconnect(); } catch (e) { } } });
+        setInterval(() => { if (!left) broadcast(); }, 3000);
+        window.addEventListener('pagehide', () => { left = true; try { peer.destroy(); } catch (e) { } });
+      } else {
+        peer.on('open', id => {
+          myId = id; map.set(id, {});
+          hostConn = peer.connect(PREFIX + code.toLowerCase(), { reliable: true });
+          let lastHeard = Date.now(), gone = false;
+          const hostGone = () => {
+            if (gone || left) return; gone = true;
+            map.clear(); map.set(myId, { ...mine }); fire();
+            for (const f of errSubs) f({ code: 'host_left', message: 'host left' });
+          };
+          hostConn.on('open', () => {
+            settled = true; clearTimeout(timer); lastHeard = Date.now();
+            const iv = setInterval(() => { if (left || gone) return clearInterval(iv); if (Date.now() - lastHeard > 10000) hostGone(); else if (hostConn.open) hostConn.send({ t: 'p', presence: mine }); }, 3000);
+            resolve(api);
+          });
+          hostConn.on('data', d => {
+            lastHeard = Date.now();
+            if (!d || d.t !== 's' || !Array.isArray(d.peers)) return;
+            map.clear();
+            for (const e of d.peers) if (Array.isArray(e) && typeof e[0] === 'string') map.set(e[0], e[1] && typeof e[1] === 'object' ? e[1] : {});
+            if (!map.has(myId)) map.set(myId, { ...mine });
+            fire();
+          });
+          hostConn.on('close', () => { if (!settled) return fail('not_found'); hostGone(); });
+        });
+      }
+    });
+  }
+  return { join, available: () => typeof Peer === 'function' };
+})();
+
 /* ===== App ===== */
 (() => {
   const $ = (s, r = document) => r.querySelector(s);
@@ -923,14 +1004,7 @@ const GEN = (() => {
 
   /* ---------- online (room capability, presence only) ---------- */
   const net = ST.net;
-  (async () => {
-    try {
-      if (!window.claude || typeof window.claude.use !== 'function') { net.status = 'off'; return rerenderIf('online'); }
-      const room = await window.claude.use('room');
-      if (room) { net.room = room; net.status = 'ready'; } else net.status = 'off';
-    } catch (e) { net.status = 'off'; }
-    rerenderIf('online');
-  })();
+  setTimeout(() => { net.status = P2P.available() ? 'ready' : 'off'; rerenderIf('online'); }, 0);
   function rerenderIf(screen) { if (ST.screen === screen) render(); }
 
   function hostRoster() {
@@ -997,23 +1071,30 @@ const GEN = (() => {
     ST.screen = st.ph === 'lobby' ? 'lobby' : st.ph === 'end' ? 'end' : 'play';
     render();
   }
+  const newCode = () => { const A = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'; let c = ''; for (let i = 0; i < 4; i++) c += A[Math.floor(Math.random() * A.length)]; return c; };
   async function joinNamed(code, role) {
     net.err = ''; net.busy = true; render();
     try {
-      const nr = await net.room.join('iso-' + code.toLowerCase());
+      let nr = null;
+      for (let tries = 0; !nr; tries++) {
+        try { nr = await P2P.join(code, role === 'host'); }
+        catch (e) { if (role === 'host' && e && e.code === 'taken' && tries < 4) code = newCode(); else throw e; }
+      }
       net.nr = nr; net.code = code; net.role = role; net.rosterSig = ''; net.peers = []; net.order = new Map(); net.myAns = {}; net.lastKey = ''; net.seen = '';
-      nr.onPeers(onPeers, e => { net.err = 'การเชื่อมต่อห้องหลุด (' + e.code + ')'; render(); });
-      if (role === 'host') { ST.g = null; pushState(); }
+      nr.onPeers(onPeers, e => { net.err = e.code === 'host_left' ? 'โฮสต์ออกจากห้องหรือปิดหน้าเกมไปแล้ว' : 'การเชื่อมต่อห้องหลุด'; if (net.role === 'client') ST.screen = 'lobby'; render(); });
+      if (role === 'host') { ST.g = null; pushState(); try { history.replaceState(null, '', '#' + code); } catch (e) { } }
       else await nr.presence({ r: 'p', nm: cleanName(net.me) });
       net.joinedAt = now();
       ST.screen = 'lobby';
     } catch (e) {
-      net.err = e && e.code === 'not_permitted' ? 'บัญชีนี้ใช้ห้องออนไลน์ของหน้านี้ไม่ได้' : 'เข้าห้องไม่สำเร็จ ลองใหม่อีกครั้ง';
+      const c = e && e.code;
+      net.err = c === 'not_found' ? 'ไม่พบห้องรหัสนี้ ตรวจรหัสอีกครั้ง หรือให้โฮสต์เปิดหน้าเกมค้างไว้' : c === 'taken' ? 'สร้างห้องไม่สำเร็จ ลองกดใหม่อีกครั้ง' : 'เชื่อมต่อไม่สำเร็จ ตรวจอินเทอร์เน็ต แล้วลองใหม่ (เครือข่ายบางแห่งบล็อกการเชื่อมต่อแบบนี้)';
     }
     net.busy = false; render();
   }
   function leaveRoom() {
     if (net.nr) net.nr.leave().catch(() => { });
+    try { if (location.hash) history.replaceState(null, '', location.pathname + location.search); } catch (e) { }
     net.nr = null; net.role = null; net.peers = []; ST.g = null; ST.screen = 'online'; render();
   }
 
@@ -1111,17 +1192,18 @@ const GEN = (() => {
   function vOnline() {
     let body;
     if (net.status === 'connecting') body = `<p class="note">กำลังตรวจสอบการเชื่อมต่อห้องออนไลน์…</p>`;
-    else if (net.status === 'off') body = `<p class="err">หน้านี้เชื่อมต่อห้องออนไลน์ไม่ได้</p><p class="note">โหมดออนไลน์ใช้ได้เมื่อเปิดหน้านี้บน claude.ai โดยผู้เล่นทุกคนเข้าสู่ระบบ และได้รับแชร์หน้านี้จากเจ้าของ ถ้าเปิดจากลิงก์สาธารณะหรือไม่ได้ล็อกอินจะเข้าห้องไม่ได้ ระหว่างนี้เล่นแบบเครื่องเดียวได้</p><div class="row"><button class="blk" data-act="go" data-to="setup">ไปเล่นเครื่องเดียว</button></div>`;
+    else if (net.status === 'off') body = `<p class="err">โหลดระบบออนไลน์ไม่สำเร็จ</p><p class="note">ตรวจอินเทอร์เน็ตแล้วรีเฟรชหน้านี้ ระหว่างนี้เล่นแบบเครื่องเดียวได้</p><div class="row"><button class="blk" data-act="go" data-to="setup">ไปเล่นเครื่องเดียว</button></div>`;
     else body = `
       <div class="field"><label for="myname">ชื่อของคุณ</label><input type="text" id="myname" value="${esc(net.me)}" maxlength="16" placeholder="ชื่อที่เพื่อนจะเห็น" autocomplete="off"></div>
       <div class="cols2">
-        <div class="field"><span class="flabel">เป็นโฮสต์</span><p class="note">สร้างห้องแล้วบอกรหัสให้เพื่อน ผู้เล่นสูงสุด 4 คนรวมโฮสต์</p><div class="row"><button class="blk ink" data-act="create"${net.busy ? ' disabled' : ''}>สร้างห้องใหม่</button></div></div>
-        <div class="field"><label for="joincode">เข้าห้องของเพื่อน</label><div class="row"><input type="text" id="joincode" maxlength="4" placeholder="รหัส 4 ตัว" style="text-transform:uppercase;width:9em" autocomplete="off"><button class="blk" data-act="join"${net.busy ? ' disabled' : ''}>เข้าห้อง</button></div></div>
+        <div class="field"><span class="flabel">เป็นโฮสต์</span><p class="note">สร้างห้องแล้วส่งลิงก์เชิญหรือรหัสให้เพื่อน ผู้เล่นสูงสุด 4 คนรวมโฮสต์ โฮสต์ต้องเปิดหน้านี้ค้างไว้ตลอดเกม</p><div class="row"><button class="blk ink" data-act="create"${net.busy ? ' disabled' : ''}>สร้างห้องใหม่</button></div></div>
+        <div class="field"><label for="joincode">เข้าห้องของเพื่อน</label><div class="row"><input type="text" id="joincode" maxlength="4" placeholder="รหัส 4 ตัว" style="text-transform:uppercase;width:9em" autocomplete="off" value="${esc(net.prefill || '')}"><button class="blk" data-act="join"${net.busy ? ' disabled' : ''}>เข้าห้อง</button></div></div>
       </div>
       ${net.err ? `<p class="err">${esc(net.err)}</p>` : ''}`;
-    return `<div class="wrap">${topBar(`<button class="link" data-act="home">กลับหน้าแรก</button>`)}<section class="panel sheet"><h2 class="sec-h">เล่นออนไลน์ <small>แต่ละคนใช้เครื่องของตัวเอง</small></h2>${body}</section></div>`;
+    return `<div class="wrap">${topBar(`<button class="link" data-act="home">กลับหน้าแรก</button>`)}<section class="panel sheet"><h2 class="sec-h">เล่นออนไลน์ <small>แต่ละคนใช้เครื่องของตัวเอง ไม่ต้องล็อกอิน</small></h2>${body}</section></div>`;
   }
 
+  const inviteURL = () => location.href.split('#')[0] + '#' + net.code;
   function vLobby() {
     const isHost = net.role === 'host';
     let roster, cfg, hostHere = true;
@@ -1144,7 +1226,7 @@ const GEN = (() => {
       <section class="panel sheet">
         <div class="row" style="justify-content:space-between;align-items:flex-end">
           <div><span class="flabel">รหัสห้อง</span><div class="code" aria-label="รหัสห้อง ${esc(net.code)}">${esc(net.code)}</div></div>
-          <p class="note" style="max-width:24em">เพื่อนเปิดหน้านี้ กด "เล่นออนไลน์" แล้วใส่รหัสนี้${watchers ? ` · มีผู้ชมอีก ${watchers} คน` : ''}</p>
+          <div class="field" style="max-width:30em">${isHost ? `<p class="note">ส่งลิงก์นี้ให้เพื่อน เปิดแล้วจะขึ้นช่องรหัสห้องให้ทันที</p><div class="row"><input type="text" id="invite" readonly value="${esc(inviteURL())}" style="flex:1;min-width:12em"><button class="blk sm" data-act="copy">${net.copied ? 'คัดลอกแล้ว' : 'คัดลอกลิงก์'}</button></div><p class="note">อย่าปิดหรือรีเฟรชหน้านี้ระหว่างเล่น ไม่อย่างนั้นห้องจะหาย</p>` : ''}${watchers ? `<p class="note">มีผู้ชมอีก ${watchers} คน</p>` : ''}</div>
         </div>
         <div class="slots">${slots}</div>
         ${cfgView}
@@ -1325,6 +1407,12 @@ const GEN = (() => {
         joinNamed(code, 'client'); break;
       }
       case 'leave': leaveRoom(); break;
+      case 'copy': {
+        const el = $('#invite');
+        const ok = () => { net.copied = true; render(); setTimeout(() => { net.copied = false; rerenderIf('lobby'); }, 2000); };
+        try { navigator.clipboard.writeText(inviteURL()).then(ok, () => { el.select(); }); } catch (e) { el.select(); }
+        break;
+      }
       case 'start-online': {
         const roster = hostRoster();
         ST.g = makeGame(ST.cfg, roster, 'online');
@@ -1388,6 +1476,8 @@ const GEN = (() => {
   }, 200);
   setInterval(() => { if (ST.screen === 'lobby' && net.role === 'client' && !findHost()) render(); }, 2500);
 
+  const hc = (location.hash || '').slice(1).toUpperCase();
+  if (/^[A-Z0-9]{4}$/.test(hc)) { net.prefill = hc; ST.screen = 'online'; }
   render();
 })();
 
